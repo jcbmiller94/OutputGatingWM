@@ -1,39 +1,39 @@
 #Irrelevant WM content unwittingly biases visual perception/attention toward matching information in the environment
-Soto et al., TICS
-•	PFC lesion patients are particularly impaired at rejecting distractors that match WM
-o	Maybe prefrontal regions serve to keep representations (WM and search templates) separate?
-•	Assumption is that this behavioral effect occurs because of impact on perceptual sensitivity—but what about output at the decision/motor level?
+- Soto et al., TICS
+- PFC lesion patients are particularly impaired at rejecting distractors that match WM
+- Maybe prefrontal regions serve to keep representations (WM and search templates) separate?
+- Assumption is that this behavioral effect occurs because of impact on perceptual sensitivity—but what about output at the decision/motor level?
 
 #WM content can produce Stroop-like (stimulus & response) conflict in a simple perceptual decision (when no matching information is present)
-Kiyonaga & Egner, Psych Science
-•	We know basically nothing about how the neural mechanisms of this effect may mirror the classic Stroop task, but the conflict probably engages ACC, and likely DLPFC too, esp cause of WM part
-•	This basic approach could be translated to the motor domain
+- Kiyonaga & Egner, Psych Science
+- We know basically nothing about how the neural mechanisms of this effect may mirror the classic Stroop task, but the conflict probably engages ACC, and likely DLPFC too, esp cause of WM part
+- This basic approach could be translated to the motor domain
 
 #Spatial Stroop co-activates competing motor responses
 DeSoto et al, JoCN
-•	When a spatial dimension is involved, subjects are assumed to be more prone to activate manual than verbal response patterns, and vice versa when a semantic dimension is involved
-•	Extent of interference relates to degree to which both dimensions activate the distinct responses
-•	In this task, subs were slower overall and showed more interference for a meaning-based task than a spatial position task
-•	Expectation for us would be that a concurrent WM representation might similarly co-activate a representation that could be compatible or incompatible with the motor representation for the intervening task
+- When a spatial dimension is involved, subjects are assumed to be more prone to activate manual than verbal response patterns, and vice versa when a semantic dimension is involved
+- Extent of interference relates to degree to which both dimensions activate the distinct responses
+- In this task, subs were slower overall and showed more interference for a meaning-based task than a spatial position task
+- Expectation for us would be that a concurrent WM representation might similarly co-activate a representation that could be compatible or incompatible with the motor representation for the intervening task
 
 #Limits in bi-manual coordination are highly sensitive to how action goals are represented
 Oliviera & Ivry
-•	Participants are slower to initiate movements with asymmetric trajectories
-•	Symbolically cued movements yield more cross-talk than sensory guided ones
-•	Internally generated movements engage basal ganlia, ACC, inferior frontal and parietal
-•	Critical role for parietal in actions that require translation of symbolic info into action
-•	we are gonna ask whether its not just actual responses/action plans, but the meaning of a WM rep, that can interfere, even when the associated response is not yet known. i.e., resp will be a match/non-match judgment, but the actual effector/resp button wont be known until probe
+- Participants are slower to initiate movements with asymmetric trajectories
+- Symbolically cued movements yield more cross-talk than sensory guided ones
+- Internally generated movements engage basal ganlia, ACC, inferior frontal and parietal
+- Critical role for parietal in actions that require translation of symbolic info into action
+- we are gonna ask whether its not just actual responses/action plans, but the meaning of a WM rep, that can interfere, even when the associated response is not yet known. i.e., resp will be a match/non-match judgment, but the actual effector/resp button wont be known until probe
 
 #Any given WM representation should only control behavior when the output gate is open
 Chatham et al., Neuron
-•	representations maintained in lateral PFC (here pre-dorsal premotor, PrePMd) act as input to dorsal striatum, which in turn amplifies one of these representations to influence behavior
-•	rostral frontal areas modulate the output gating of more caudal frontostriatal circuits
-•	premotor reps are thought to influence which of several candidate motor responses constitutes the effective output of M1
-•	Do actively maintained WM representations get improperly gated to control motor output?
-o	This model can guide our TMS targets to perturb representations or gating mechanisms
-♣	 If PFC controls segregation between relevant representations, will its disruption make interference even worse?
-♣	If striatum controls gating of WM, will its disruption prevent improper gating of irrelevant WM content?
+- representations maintained in lateral PFC (here pre-dorsal premotor, PrePMd) act as input to dorsal striatum, which in turn amplifies one of these representations to influence behavior
+- rostral frontal areas modulate the output gating of more caudal frontostriatal circuits
+- premotor reps are thought to influence which of several candidate motor responses constitutes the effective output of M1
+- Do actively maintained WM representations get improperly gated to control motor output?
+- This model can guide our TMS targets to perturb representations or gating mechanisms
+- If PFC controls segregation between relevant representations, will its disruption make interference even worse?
+- If striatum controls gating of WM, will its disruption prevent improper gating of irrelevant WM content?
 
 #Striatal activity can be selectively targeted, in a task-dependent way, with prefrontal and M1 stimulation
 Van Schouwenburg et al., J Neurosci
-•	We will do this
+- We will do this
