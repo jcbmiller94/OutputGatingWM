@@ -3,6 +3,8 @@ function WM_Simon_dots_mouse
 %click the screen at an associated location--this is to best approximate a
 %reaching movement
 
+%%% timestamp movement onset and add to results printout 
+
 %%
 rng('default'); %sometimes, if you've recently initiated the legacy random number generator, it wont let you use rng until you reset it to default, or something
 rng('shuffle');
@@ -31,7 +33,7 @@ end
 %(I just happen to like using text files, but you can output the data in
 %any way that will work the best for your preferred analysis style)
 fid = fopen(datafilename, 'w');
-fprintf(fid, 'subject CurrentCondition TrialType CurrentSampleIndex CurrentSample cueColor correctResp Resp ACC msecRT CurrentProbeMatch ProbeSide correctProbeResp probeResp probeACC probemsecRT\n');
+fprintf(fid, 'subject CurrentCondition TrialType CurrentSampleIndex CurrentSample cueColor correctResp Resp ACC msecRT move_init_msecRT CurrentProbeMatch ProbeSide correctProbeResp probeResp probeACC probemsecRT\n');
 
 % make a cell array to hold data for tracking the cursor path 
 %  in this cell array, each row is a block and each column is a trial
@@ -91,7 +93,7 @@ KeyBoardNum = GetKeyboardIndices;
     WMProbe = 3;
     
     BlockNum = 2;
-    TrialNum = 2; %orig = 24
+    TrialNum = 2; %orig = 24 %play around with 3 of trials in 20-25 min %40 trials per condition? 
     %adjust # of blocks and trials
     
     %change detection response keys
@@ -123,8 +125,11 @@ KeyBoardNum = GetKeyboardIndices;
     TrialsPer = TrialNum/2; %Divide # of trials by # of conditions, to get equal trials of each type
     TrialsPer = ceil(TrialsPer);
     
+    TrialsPerCongruency = TrialNum/3;
+    TrialsPerCongruency = ceil(TrialsPerCongruency);
+    
     %include 3s in this vector if you want to have a neutral condition
-    Condition = [ones(1, TrialsPer) 2*ones(1, TrialsPer) 3*ones(1, TrialsPer)]; % 1 = compatible, 2 = incompatible, 3 = neutral    
+    Condition = [ones(1, TrialsPerCongruency) 2*ones(1, TrialsPerCongruency) 3*ones(1, TrialsPerCongruency)]; % 1 = compatible, 2 = incompatible, 3 = neutral    
     ProbeMatch = [ones(1, TrialsPer) 2*ones(1, TrialsPer)];
     SampleIndex = [ones(1, TrialsPer) 2*ones(1, TrialsPer)];
     
@@ -360,6 +365,7 @@ KeyBoardNum = GetKeyboardIndices;
                     resp = 9999; %reset this variable before each response phase to avoid wonky behavior if they don't respond at all
 
                     trial_path = [];
+                    cursor_moved = false; 
                     
                     %this loop will listen for clicks inside the boxes
                     %associated with the color cue
@@ -388,24 +394,35 @@ KeyBoardNum = GetKeyboardIndices;
                             else enterResp=false;   
                             end                                                 
                         end
-
+                        
+                        % recording the coordinates of the cursor until the loop is broken with click inside a box 
+                        [x,y,buttons] = GetMouse(win);
+                        current_pos = [x, y, buttons];
+                        trial_path = [trial_path; current_pos];
+                        
+                        %if cursor moves for the FIRST time form the
+                        %center position, get the time of that movement 
+                        if cursor_moved == false && isequal(current_pos(1:2),trial_path(1,1:2)) == 0
+                            move_init = GetSecs;
+                            cursor_moved = true;                           
+                        elseif cursor_moved == true
+                        else move_init = 9999;
+                        end 
+                        
                         % break the response loop after a designated
                         % deadline
                         if GetSecs - cueStart > responseDeadline 
                             enterResp = true; 
                         end
                         
-                        % recording the coordinates of the cursor until the loop is broken with click inside a box 
-                        [x,y,buttons] = GetMouse(win);
-                        current_pos = [x, y, buttons];
-                        trial_path = [trial_path; current_pos];
-                       
                     end
                     
                     %save the trial path to the cell array of paths for
                     %each trial 
                     cursor_path{block, trial} = trial_path;                    
                     
+                    %calculate RT, time from the start of the cue to the
+                    %response click
                     rt = GetSecs - cueStart;
                     msecRT=round(1000*rt);
                     
@@ -414,6 +431,12 @@ KeyBoardNum = GetKeyboardIndices;
                     else
                         msecRT = num2str(msecRT);
                     end
+
+                    %calculate movement initializing RT, time from cue to
+                    %the first movement of the cursor
+                    init_rt = move_init - cueStart; 
+                    move_init_msecRT = round(1000*init_rt);
+                    move_init_msecRT = num2str(move_init_msecRT); 
                         
                 %calculate accuracy
                 Accuracy = strcmp(resp,correctResp); 
@@ -497,9 +520,9 @@ KeyBoardNum = GetKeyboardIndices;
                 end            
                 
                                                
-
+        %add movement initiation time and data type
         %print trial info to data file
-            fprintf(fid,'%s %i %s %d %s %s %s %s %d %s %i %s %s %s %d %s\n',...
+            fprintf(fid,'%s %i %s %d %s %s %s %s %d %s %s %i %s %s %s %d %s\n',...
             subject,...
             CurrentCondition,...
             TrialType,...
@@ -510,6 +533,7 @@ KeyBoardNum = GetKeyboardIndices;
             resp,...
             ACC,...
             msecRT,...
+            move_init_msecRT,...
             CurrentProbeMatch,...
             ProbeSide,...
             correctProbeResp,...
