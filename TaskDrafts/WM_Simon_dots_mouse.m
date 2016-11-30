@@ -147,7 +147,7 @@ KeyBoardNum = GetKeyboardIndices;
     %make spatial dot WM cues 
     
     %Make a destination rectangle for stimuli
-    stimSize = 100;
+    stimSize = 70; %orig = 100
     xcorner = centerX+stimSize;
     ycorner = centerY+stimSize;
     
@@ -158,8 +158,8 @@ KeyBoardNum = GetKeyboardIndices;
     centerRect = CenterRectOnPointd(stimRect, Xcenter, Ycenter);
     
     %change this to move the location of the spatial stimuli
-    Xoffset = 200;   
-    Yoffset = 200;
+    Xoffset = 400;   %orig = 200
+    Yoffset = 400;   %orig = 200
     %can be hard-coded as a certain distance, or made a proportion of the
     %screen
 %     Xoffset = screenXpixels/4;
@@ -406,7 +406,7 @@ KeyBoardNum = GetKeyboardIndices;
                             move_init = GetSecs;
                             cursor_moved = true;                           
                         elseif cursor_moved == true
-                        else move_init = 9999;
+                        else move_init = 0;
                         end 
                         
                         % break the response loop after a designated
@@ -431,12 +431,19 @@ KeyBoardNum = GetKeyboardIndices;
                     else
                         msecRT = num2str(msecRT);
                     end
-
+                    
                     %calculate movement initializing RT, time from cue to
                     %the first movement of the cursor
                     init_rt = move_init - cueStart; 
-                    move_init_msecRT = round(1000*init_rt);
-                    move_init_msecRT = num2str(move_init_msecRT); 
+                    if move_init == 0
+                        init_rt = 0;
+                    end                 
+                    move_init_msecRT = round(1000*init_rt); 
+                    if move_init_msecRT == 0
+                        move_init_msecRT = 'No-move';
+                    else
+                        move_init_msecRT = num2str(move_init_msecRT);
+                    end
                         
                 %calculate accuracy
                 Accuracy = strcmp(resp,correctResp); 

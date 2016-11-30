@@ -1,4 +1,4 @@
-function WM_Simon_dots_mouse_directcue
+function WM_Simon_dots_mouse_directcue_practice
 %this version uses a verbal WM cue, and an intervening symbolic cue to
 %click the screen at an associated location--this is to best approximate a
 %reaching movement
@@ -9,29 +9,29 @@ rng('shuffle');
 
 KbName('UnifyKeyNames'); 
     
-%message pops up in the command window to ask for subject number   
-subject = input('Enter SUBJECT number ', 's');
-
-%name of data output file 
-datafilename = strcat('MotorData/WM_Simon_dots_mouse_directcue_', subject, '.txt'); 
-
-%if a file with that same info already exists in the data folder, give a
-%new subject #, or overwrite the existing file
-if exist(datafilename)==2
-    disp ('A file with this name already exists')
-    overwrite = input('overwrite?, y/n \n', 's');
-    if strcmpi(overwrite, 'n')
-        %disp('enter new subject number');
-        newsub = input('New SUBJECT number? ', 's');
-        datafilename = strcat('MotorData/WM_Simon_dots_mouse_directcue_', newsub, '.txt');
-    end
-end
+% %message pops up in the command window to ask for subject number   
+% subject = input('Enter SUBJECT number ', 's');
+% 
+% %name of data output file 
+% datafilename = strcat('MotorData/WM_Simon_dots_mouse_directcue_', subject, '.txt'); 
+% 
+% %if a file with that same info already exists in the data folder, give a
+% %new subject #, or overwrite the existing file
+% if exist(datafilename)==2
+%     disp ('A file with this name already exists')
+%     overwrite = input('overwrite?, y/n \n', 's');
+%     if strcmpi(overwrite, 'n')
+%         %disp('enter new subject number');
+%         newsub = input('New SUBJECT number? ', 's');
+%         datafilename = strcat('MotorData/WM_Simon_dots_mouse_directcue_', newsub, '.txt');
+%     end
+% end
 
 %make a space-delimited text output file where each trial is a row
 %(I just happen to like using text files, but you can output the data in
 %any way that will work the best for your preferred analysis style)
-fid = fopen(datafilename, 'w');
-fprintf(fid, 'subject CurrentCondition TrialType CurrentSampleIndex CurrentSample targetLoc correctResp Resp ACC msecRT move_init_msecRT CurrentProbeMatch ProbeSide correctProbeResp probeResp probeACC probemsecRT\n');
+%fid = fopen(datafilename, 'w');
+%fprintf(fid, 'subject CurrentCondition TrialType CurrentSampleIndex CurrentSample targetLoc correctResp Resp ACC msecRT move_init_msecRT CurrentProbeMatch ProbeSide correctProbeResp probeResp probeACC probemsecRT\n');
 
 % make a cell array to hold data for tracking the cursor path 
 %  in this cell array, each row is a block and each column is a trial
@@ -91,8 +91,11 @@ KeyBoardNum = GetKeyboardIndices;
     responseDeadline = 4;
     WMProbe = 3;
     
-    BlockNum = 2;
-    TrialNum = 2; %orig = 24
+    feedback = 1; %amount of time feedback is displayed on the screen 
+
+    
+    BlockNum = 1;
+    TrialNum = 5; %orig = 24
     %adjust # of blocks and trials
     
     %change detection response keys
@@ -214,7 +217,27 @@ KeyBoardNum = GetKeyboardIndices;
 %% Start task block loop
         
     %show instruction screen
-    welcome=sprintf('Move your mouse to click green box\n\n\nPress "S" for same word, "D" for different\n\n\n\nPress space to begin the experiment \n \n \n');
+    instructions=sprintf(['This is a practice of the experiment you will be doing\n\n\nA series of dots will appear on either the right or left side of the screen\n\n\n' ... 
+        'Remember the side of the screen on which the dots appear....\n\n\n(Press space to continue)']) 
+    DrawFormattedText(win, instructions, 'center', 'center', 0);
+    Screen('Flip', win);    
+    if IsOSX
+        getKey('space', KeyBoardNum); %OSX requires a device number whereas windows requires none
+    else
+        getKey('space');
+    end
+    
+    instructions=sprintf(['Three boxes will then appear, with your cursor on the middle of the screen\n\nMove the mouse and click on the green filled box\n\n\n' ... 
+    'After a click, dots will appear again on the right or left side\n\nUse "S" (same) or "D" (different)to indicate whether this is the same side as before\n\n\n(Press space to continue)']) 
+    DrawFormattedText(win, instructions, 'center', 'center', 0);
+    Screen('Flip', win);    
+    if IsOSX
+        getKey('space', KeyBoardNum); %OSX requires a device number whereas windows requires none
+    else
+        getKey('space');
+    end  
+    
+    welcome=sprintf('Move your mouse to click green box\n\n\nPress "S" for same dot side, "D" for different\n\n\n\n(Press space to begin the experiment)\n \n \n');
     DrawFormattedText(win, welcome, 'center', 'center', 0);
     Screen('Flip', win);
     %'Flip' called to put stimuli onto screen 
@@ -463,8 +486,14 @@ KeyBoardNum = GetKeyboardIndices;
 
                 if Accuracy == 1 
                     ACC = 1;
+                    DrawFormattedText(win, 'Correct!', 'center', 'center', 0);
+                    Screen('Flip', win); 
+                    WaitSecs(feedback);
                 else ACC = 0;
-                end            
+                    DrawFormattedText(win, 'Incorrect', 'center', 'center', 0);
+                    Screen('Flip', win); 
+                    WaitSecs(feedback);
+                end              
                        
             
             HideCursor;
@@ -536,30 +565,41 @@ KeyBoardNum = GetKeyboardIndices;
 
                 if probeAccuracy == 1 
                     probeACC = 1;
+                    DrawFormattedText(win, 'Correct!', 'center', 'center', 0);
+                    Screen('Flip', win); 
+                    WaitSecs(feedback);
                 else probeACC = 0;
-                end            
-                
-                                               
+                    DrawFormattedText(win, 'Incorrect', 'center', 'center', 0);
+                    Screen('Flip', win); 
+                    WaitSecs(feedback);
+                end  
+                  
+               %let them know that they have completed one trial
+                if trial == 1
+                    DrawFormattedText(win, 'You completed one practice trial!\n\n\nNow, you will complete several trials in a row', 'center', 'center', 0);
+                    Screen('Flip', win); 
+                    WaitSecs(2);
+                end 
 
-        %print trial info to data file
-            fprintf(fid,'%s %i %s %d %s %s %s %s %d %s %s %i %s %s %s %d %s\n',...
-            subject,...
-            CurrentCondition,...
-            TrialType,...
-            CurrentSampleIndex,...
-            CurrentSample,...
-            targetLoc,...
-            correctResp,...
-            resp,...
-            ACC,...
-            msecRT,...
-            move_init_msecRT,...
-            CurrentProbeMatch,...
-            ProbeSide,...
-            correctProbeResp,...
-            probeResp,...
-            probeACC,...
-            probemsecRT);
+%         %print trial info to data file
+%             fprintf(fid,'%s %i %s %d %s %s %s %s %d %s %s %i %s %s %s %d %s\n',...
+%             subject,...
+%             CurrentCondition,...
+%             TrialType,...
+%             CurrentSampleIndex,...
+%             CurrentSample,...
+%             targetLoc,...
+%             correctResp,...
+%             resp,...
+%             ACC,...
+%             msecRT,...
+%             move_init_msecRT,...
+%             CurrentProbeMatch,...
+%             ProbeSide,...
+%             correctProbeResp,...
+%             probeResp,...
+%             probeACC,...
+%             probemsecRT);
     
         end
     
@@ -568,7 +608,7 @@ KeyBoardNum = GetKeyboardIndices;
     %kindly give participants a helpful indicator of how much more
     %excrutiating misery they have left to endure
        if block == BlockNum
-           message=sprintf('You are now done with the experiment \n \n \n Thanks for participating! \n \n');
+           message=sprintf('You are now done with the experiment \n\n\n Here, you received "correct" and "incorrect" feedback, \nbut in the real experiment you will not\n\n\nLet us know if you have any questions before the real thing! \n \n');
        else
            thisblock = num2str(block);
            allblock = num2str(BlockNum);
@@ -593,8 +633,8 @@ KeyBoardNum = GetKeyboardIndices;
 
 
 %name of data output file 
-cursor_data_filename = strcat('MotorData/WM_Simon_dots_mouse_directcue_', subject, '_cursor_data.mat'); 
-save(cursor_data_filename, 'cursor_path'); 
+%cursor_data_filename = strcat('MotorData/WM_Simon_dots_mouse_directcue_', subject, '_cursor_data.mat'); 
+%save(cursor_data_filename, 'cursor_path'); 
 
 ListenChar(0);
 Screen('CloseAll');

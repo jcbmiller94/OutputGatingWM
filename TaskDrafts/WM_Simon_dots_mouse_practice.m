@@ -1,7 +1,9 @@
-function WM_Simon_dots_mouse_directcue
+function WM_Simon_dots_mouse_practice
 %this version uses a verbal WM cue, and an intervening symbolic cue to
 %click the screen at an associated location--this is to best approximate a
 %reaching movement
+
+%%% timestamp movement onset and add to results printout 
 
 %%
 rng('default'); %sometimes, if you've recently initiated the legacy random number generator, it wont let you use rng until you reset it to default, or something
@@ -10,35 +12,34 @@ rng('shuffle');
 KbName('UnifyKeyNames'); 
     
 %message pops up in the command window to ask for subject number   
-subject = input('Enter SUBJECT number ', 's');
+%subject = input('Enter SUBJECT number ', 's');
 
-%name of data output file 
-datafilename = strcat('MotorData/WM_Simon_dots_mouse_directcue_', subject, '.txt'); 
-
-%if a file with that same info already exists in the data folder, give a
-%new subject #, or overwrite the existing file
-if exist(datafilename)==2
-    disp ('A file with this name already exists')
-    overwrite = input('overwrite?, y/n \n', 's');
-    if strcmpi(overwrite, 'n')
-        %disp('enter new subject number');
-        newsub = input('New SUBJECT number? ', 's');
-        datafilename = strcat('MotorData/WM_Simon_dots_mouse_directcue_', newsub, '.txt');
-    end
-end
+% %name of data output file 
+% datafilename = strcat('MotorData/WM_Simon_dots_mouse_', subject, '.txt'); 
+% 
+% %if a file with that same info already exists in the data folder, give a
+% %new subject #, or overwrite the existing file
+% if exist(datafilename)==2
+%     disp ('A file with this name already exists')
+%     overwrite = input('overwrite?, y/n \n', 's');
+%     if strcmpi(overwrite, 'n')
+%         %disp('enter new subject number');
+%         newsub = input('New SUBJECT number? ', 's');
+%         datafilename = strcat('MotorData/WM_Simon_dots_mouse_', newsub, '.txt');
+%     end
+% end
 
 %make a space-delimited text output file where each trial is a row
 %(I just happen to like using text files, but you can output the data in
 %any way that will work the best for your preferred analysis style)
-fid = fopen(datafilename, 'w');
-fprintf(fid, 'subject CurrentCondition TrialType CurrentSampleIndex CurrentSample targetLoc correctResp Resp ACC msecRT move_init_msecRT CurrentProbeMatch ProbeSide correctProbeResp probeResp probeACC probemsecRT\n');
+% fid = fopen(datafilename, 'w');
+% fprintf(fid, 'subject CurrentCondition TrialType CurrentSampleIndex CurrentSample cueColor correctResp Resp ACC msecRT move_init_msecRT CurrentProbeMatch ProbeSide correctProbeResp probeResp probeACC probemsecRT\n');
 
 % make a cell array to hold data for tracking the cursor path 
 %  in this cell array, each row is a block and each column is a trial
 %  (each element being the path for that trial in that block)
 
 cursor_path = {}; 
-
 
 %% Some PTB and Screen set-up  
 AssertOpenGL;    
@@ -54,7 +55,7 @@ GetSecs;
 %need to know the keyboard number in order to receive key input
 KeyBoardNum = GetKeyboardIndices; 
 
-    Screen('Preference', 'SkipSyncTests',2); %1 skips the tests, 0 conducts them
+    Screen('Preference', 'SkipSyncTests', 1); %1 skips the tests, 0 conducts them
     Screen('Preference', 'VBLTimestampingMode', 1);
     
     %you can either use the highest screen index in a multiple monitor
@@ -91,8 +92,10 @@ KeyBoardNum = GetKeyboardIndices;
     responseDeadline = 4;
     WMProbe = 3;
     
-    BlockNum = 2;
-    TrialNum = 2; %orig = 24
+    feedback = 1; %amount of time feedback is displayed on the screen 
+    
+    BlockNum = 1;
+    TrialNum = 5; %orig = 24 %play around with 3 of trials in 20-25 min %40 trials per condition? 
     %adjust # of blocks and trials
     
     %change detection response keys
@@ -112,26 +115,23 @@ KeyBoardNum = GetKeyboardIndices;
     
     %these RGB values were selected to be maximally different using the
     %color tool at I Want Hue
-    %leftRGB = [164 108 183]; %left, purple
-    %rightRGB = [203 106 73]; %right, orange
+    leftRGB = [164 108 183]; %left, purple
+    rightRGB = [203 106 73]; %right, orange
+    upRGB = [122 164 87]; %up, green
     
-    %for this version, only using the RGB cue green as a direct cue to
-    %guide click towards the designated square 
-    targetRGB = [122 164 87]; %up, green
-    
-    leftTarget = 'left';
-    rightTarget = 'right';
-    upTarget = 'up'; 
-    %leftColor = 'purple';
-    %rightColor = 'orange';
-    %upColor = 'green';
+    leftColor = 'purple';
+    rightColor = 'orange';
+    upColor = 'green';
     
     %make a vector of codes for the trial conditions    
     TrialsPer = TrialNum/2; %Divide # of trials by # of conditions, to get equal trials of each type
     TrialsPer = ceil(TrialsPer);
     
+    TrialsPerCongruency = TrialNum/3;
+    TrialsPerCongruency = ceil(TrialsPerCongruency);
+    
     %include 3s in this vector if you want to have a neutral condition
-    Condition = [ones(1, TrialsPer) 2*ones(1, TrialsPer) 3*ones(1, TrialsPer)]; % 1 = compatible, 2 = incompatible, 3 = neutral    
+    Condition = [ones(1, TrialsPerCongruency) 2*ones(1, TrialsPerCongruency) 3*ones(1, TrialsPerCongruency)]; % 1 = compatible, 2 = incompatible, 3 = neutral    
     ProbeMatch = [ones(1, TrialsPer) 2*ones(1, TrialsPer)];
     SampleIndex = [ones(1, TrialsPer) 2*ones(1, TrialsPer)];
     
@@ -160,8 +160,8 @@ KeyBoardNum = GetKeyboardIndices;
     centerRect = CenterRectOnPointd(stimRect, Xcenter, Ycenter);
     
     %change this to move the location of the spatial stimuli
-    Xoffset = 400; %orig = 200 
-    Yoffset = 400; %orig = 200
+    Xoffset = 400;   %orig = 200
+    Yoffset = 400;   %orig = 200
     %can be hard-coded as a certain distance, or made a proportion of the
     %screen
 %     Xoffset = screenXpixels/4;
@@ -212,9 +212,38 @@ KeyBoardNum = GetKeyboardIndices;
     fixCenter = CenterRectOnPointd(fixRect, Xcenter, Ycenter);
     
 %% Start task block loop
-        
+   
     %show instruction screen
-    welcome=sprintf('Move your mouse to click green box\n\n\nPress "S" for same word, "D" for different\n\n\n\nPress space to begin the experiment \n \n \n');
+    instructions=sprintf(['This is a practice of the experiment you will be doing\n\n\nA series of dots will appear on either the right or left side of the screen\n\n\n' ... 
+        'Remember the side of the screen on which the dots appear....\n\n\n(Press space to continue)']) 
+    DrawFormattedText(win, instructions, 'center', 'center', 0);
+    Screen('Flip', win);    
+    if IsOSX
+        getKey('space', KeyBoardNum); %OSX requires a device number whereas windows requires none
+    else
+        getKey('space');
+    end
+    
+    instructions=sprintf(['Four boxes will then appear, with your cursor on the middle of the screen\n\n\n Based on the color of the middle box, click one of the other boxes\n\n' ... 
+    'purple: click left box\n\norange: click right box\n\ngreen: click top box\n\n\n(Press space to continue)']) 
+    DrawFormattedText(win, instructions, 'center', 'center', 0);
+    Screen('Flip', win);    
+    if IsOSX
+        getKey('space', KeyBoardNum); %OSX requires a device number whereas windows requires none
+    else
+        getKey('space');
+    end  
+     
+    instructions=sprintf(['After a click, dots will appear again on the right or left side\n\n\nUse "S" (same) or "D" (different) to indicate whether this is the same side as before\n\n\n(Press space to continue)'])
+    DrawFormattedText(win, instructions, 'center', 'center', 0);
+    Screen('Flip', win);    
+    if IsOSX
+        getKey('space', KeyBoardNum); %OSX requires a device number whereas windows requires none
+    else
+        getKey('space');
+    end  
+
+    welcome=sprintf('Click left box for purple, right for orange, top for green\n\n\nPress "S" for same word, "D" for different\n\n\n\nPress space to begin the experiment \n \n \n');
     DrawFormattedText(win, welcome, 'center', 'center', 0);
     Screen('Flip', win);
     %'Flip' called to put stimuli onto screen 
@@ -276,21 +305,17 @@ KeyBoardNum = GetKeyboardIndices;
                     
                     if CurrentSampleIndex == 1
                        CurrentSample = leftWord;
-                       CurrentTarget = leftRect; %setting which rectangle will be filled (target) and which will be empty (nontargets) 
-                       nonTarget1 = topRect;
-                       nonTarget2 = rightRect; 
-                       targetLoc = leftTarget;                    
+                       CurrentMotor = leftRGB;
+                       cueColor = leftColor;                    
                        correctResp = leftResp;
                         
                        xy = Lxy; %left dot array 
-                       center = Lcenter; %center location around which dot locations are randomized (currently [0,0] for all)
+                       center = Lcenter;
                         
                     elseif CurrentSampleIndex == 2
                        CurrentSample = rightWord;
-                       CurrentTarget = rightRect;
-                       nonTarget1 = topRect;
-                       nonTarget2 = leftRect;
-                       targetLoc = rightTarget;
+                       CurrentMotor = rightRGB;
+                       cueColor = rightColor;
                        correctResp = rightResp;
                         
                        xy = Rxy; %Right dot array
@@ -302,10 +327,8 @@ KeyBoardNum = GetKeyboardIndices;
                     
                     if CurrentSampleIndex == 1
                         CurrentSample = leftWord;
-                        CurrentTarget = rightRect;
-                        nonTarget1 = topRect;
-                        nonTarget2 = leftRect;
-                        targetLoc = rightTarget;                       
+                        CurrentMotor = rightRGB;
+                        cueColor = rightColor;                       
                         correctResp = rightResp;
                         
                         xy = Lxy; %left dot array 
@@ -313,10 +336,8 @@ KeyBoardNum = GetKeyboardIndices;
                         
                     elseif CurrentSampleIndex == 2
                         CurrentSample = rightWord;
-                        CurrentTarget = leftRect;
-                        nonTarget1 = topRect;
-                        nonTarget2 = rightRect;
-                        targetLoc = leftTarget;                        
+                        CurrentMotor = leftRGB;
+                        cueColor = leftColor;                        
                         correctResp = leftResp;   
                         
                         xy = Rxy; %Right dot array
@@ -336,10 +357,8 @@ KeyBoardNum = GetKeyboardIndices;
                         center = Rcenter;
                     end
                     
-                        CurrentTarget = topRect;
-                        nonTarget1 = rightRect;
-                        nonTarget2 = leftRect;
-                        targetLoc = upTarget;                        
+                        CurrentMotor = upRGB;
+                        cueColor = upColor;                        
                         correctResp = upResp;
             end
 
@@ -347,7 +366,6 @@ KeyBoardNum = GetKeyboardIndices;
         %show WM sample 
         
             %DrawFormattedText(win, CurrentSample, 'center', 'center', 0);
-            %displays the two dot array on left or right side specified by the random locations in variable xy 
             [minSmoothPointSize, maxSmoothPointSize, minAliasedPointSize, maxAliasedPointSize] = Screen('DrawDots', win, xy, 15, [0 0 0], center, 1);
             Screen('Flip', win);
             WaitSecs(SampleShow); 
@@ -358,13 +376,10 @@ KeyBoardNum = GetKeyboardIndices;
 
         %show motor cue during WM delay
         
-           %Screen('FillRect', win, CurrentMotor, centerRect); 
-            %Filling the rectangle deignated as CurrentTarget, the target
-            %which should be clicked
-            Screen('FillRect', win, targetRGB, CurrentTarget);
-            Screen('FrameRect', win, sampleColor, CurrentTarget, frameWidth); 
-            Screen('FrameRect', win, sampleColor, nonTarget1, frameWidth);
-            Screen('FrameRect', win, sampleColor, nonTarget2, frameWidth);
+            Screen('FillRect', win, CurrentMotor, centerRect);    
+            Screen('FrameRect', win, sampleColor, leftRect, frameWidth);
+            Screen('FrameRect', win, sampleColor, rightRect, frameWidth);
+            Screen('FrameRect', win, sampleColor, topRect, frameWidth);
             %Screen('Flip', win);
             %WaitSecs(MotorShow); 
                         
@@ -373,7 +388,7 @@ KeyBoardNum = GetKeyboardIndices;
 
                     %puts mouse at center--but can be weird on multi-display
                     %setups
-                    SetMouse(Xcenter, Ycenter, win);
+                    SetMouse(Xcenter, Ycenter);
                     [~, cueStart] = Screen('Flip', win);
 
                     enterResp=false;
@@ -381,7 +396,7 @@ KeyBoardNum = GetKeyboardIndices;
                     resp = 9999; %reset this variable before each response phase to avoid wonky behavior if they don't respond at all
 
                     trial_path = [];
-                    cursor_moved = false;
+                    cursor_moved = false; 
                     
                     %this loop will listen for clicks inside the boxes
                     %associated with the color cue
@@ -408,7 +423,7 @@ KeyBoardNum = GetKeyboardIndices;
                                 
                             % if a click surrounds the response box, but doesn't fall inside it, do nothing     
                             else enterResp=false;   
-                            end                       
+                            end                                                 
                         end
                         
                         % recording the coordinates of the cursor until the loop is broken with click inside a box 
@@ -425,17 +440,20 @@ KeyBoardNum = GetKeyboardIndices;
                         else move_init = 0;
                         end 
                         
-                         % break the response loop after a designated
+                        % break the response loop after a designated
                         % deadline
                         if GetSecs - cueStart > responseDeadline 
                             enterResp = true; 
                         end
+                        
                     end
                     
                     %save the trial path to the cell array of paths for
                     %each trial 
-                    cursor_path{block, trial} = trial_path;
+                    cursor_path{block, trial} = trial_path;                    
                     
+                    %calculate RT, time from the start of the cue to the
+                    %response click
                     rt = GetSecs - cueStart;
                     msecRT=round(1000*rt);
                     
@@ -444,7 +462,7 @@ KeyBoardNum = GetKeyboardIndices;
                     else
                         msecRT = num2str(msecRT);
                     end
-                        
+                    
                     %calculate movement initializing RT, time from cue to
                     %the first movement of the cursor
                     init_rt = move_init - cueStart; 
@@ -457,13 +475,19 @@ KeyBoardNum = GetKeyboardIndices;
                     else
                         move_init_msecRT = num2str(move_init_msecRT);
                     end
-                
+                        
                 %calculate accuracy
                 Accuracy = strcmp(resp,correctResp); 
-
+                   
                 if Accuracy == 1 
                     ACC = 1;
+                    DrawFormattedText(win, 'Correct!', 'center', 'center', 0);
+                    Screen('Flip', win); 
+                    WaitSecs(feedback);
                 else ACC = 0;
+                    DrawFormattedText(win, 'Incorrect', 'center', 'center', 0);
+                    Screen('Flip', win); 
+                    WaitSecs(feedback);
                 end            
                        
             
@@ -536,30 +560,41 @@ KeyBoardNum = GetKeyboardIndices;
 
                 if probeAccuracy == 1 
                     probeACC = 1;
+                    DrawFormattedText(win, 'Correct!', 'center', 'center', 0);
+                    Screen('Flip', win); 
+                    WaitSecs(feedback);
                 else probeACC = 0;
+                    DrawFormattedText(win, 'Incorrect', 'center', 'center', 0);
+                    Screen('Flip', win); 
+                    WaitSecs(feedback);
                 end            
                 
-                                               
-
-        %print trial info to data file
-            fprintf(fid,'%s %i %s %d %s %s %s %s %d %s %s %i %s %s %s %d %s\n',...
-            subject,...
-            CurrentCondition,...
-            TrialType,...
-            CurrentSampleIndex,...
-            CurrentSample,...
-            targetLoc,...
-            correctResp,...
-            resp,...
-            ACC,...
-            msecRT,...
-            move_init_msecRT,...
-            CurrentProbeMatch,...
-            ProbeSide,...
-            correctProbeResp,...
-            probeResp,...
-            probeACC,...
-            probemsecRT);
+                %let them know that they have completed one trial
+                if trial == 1
+                    DrawFormattedText(win, 'You completed one practice trial!\n\n\nNow, you will complete several trials in a row', 'center', 'center', 0);
+                    Screen('Flip', win); 
+                    WaitSecs(2);
+                end                                
+%         %add movement initiation time and data type
+%         %print trial info to data file
+%             fprintf(fid,'%s %i %s %d %s %s %s %s %d %s %s %i %s %s %s %d %s\n',...
+%             subject,...
+%             CurrentCondition,...
+%             TrialType,...
+%             CurrentSampleIndex,...
+%             CurrentSample,...
+%             cueColor,...
+%             correctResp,...
+%             resp,...
+%             ACC,...
+%             msecRT,...
+%             move_init_msecRT,...
+%             CurrentProbeMatch,...
+%             ProbeSide,...
+%             correctProbeResp,...
+%             probeResp,...
+%             probeACC,...
+%             probemsecRT);
     
         end
     
@@ -568,7 +603,7 @@ KeyBoardNum = GetKeyboardIndices;
     %kindly give participants a helpful indicator of how much more
     %excrutiating misery they have left to endure
        if block == BlockNum
-           message=sprintf('You are now done with the experiment \n \n \n Thanks for participating! \n \n');
+           message=sprintf('You are now done with the experiment \n\n\n Here, you received "correct" and "incorrect" feedback, \nbut in the real experiment you will not\n\n\nLet us know if you have any questions before the real thing! \n \n');
        else
            thisblock = num2str(block);
            allblock = num2str(BlockNum);
@@ -593,8 +628,9 @@ KeyBoardNum = GetKeyboardIndices;
 
 
 %name of data output file 
-cursor_data_filename = strcat('MotorData/WM_Simon_dots_mouse_directcue_', subject, '_cursor_data.mat'); 
-save(cursor_data_filename, 'cursor_path'); 
+%cursor_data_filename = strcat('MotorData/WM_Simon_dots_mouse_', subject, '_cursor_data.mat'); 
+%save(cursor_data_filename, 'cursor_path'); 
+
 
 ListenChar(0);
 Screen('CloseAll');
