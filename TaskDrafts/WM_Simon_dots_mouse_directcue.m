@@ -506,7 +506,7 @@ KeyBoardNum = GetKeyboardIndices;
             
             [minSmoothPointSize, maxSmoothPointSize, minAliasedPointSize, maxAliasedPointSize] = Screen('DrawDots', win, xy, 15, [0 0 0], center, 1);
             %DrawFormattedText(win, ProbeSide, 'center', 'center', 0);
-            %DrawFormattedText(win, '?', 'center', centerY-100, 0);
+            DrawFormattedText(win, '?', 'center', centerY-100, 0);
             Screen('Flip', win);
             %WaitSecs(WMProbe);            
 
