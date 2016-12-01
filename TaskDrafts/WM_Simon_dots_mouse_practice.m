@@ -10,6 +10,8 @@ rng('default'); %sometimes, if you've recently initiated the legacy random numbe
 rng('shuffle');
 
 KbName('UnifyKeyNames'); 
+
+% This is my first edit trakced by git! :) 
     
 %message pops up in the command window to ask for subject number   
 %subject = input('Enter SUBJECT number ', 's');
