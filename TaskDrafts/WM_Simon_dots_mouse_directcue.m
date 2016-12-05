@@ -91,8 +91,8 @@ KeyBoardNum = GetKeyboardIndices;
     responseDeadline = 4;
     WMProbe = 3;
     
-    BlockNum = 2;
-    TrialNum = 2; %orig = 24
+    BlockNum = 4;
+    TrialNum = 30; %orig = 24
     %adjust # of blocks and trials
     
     %change detection response keys
