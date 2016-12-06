@@ -55,7 +55,9 @@ GetSecs;
 %need to know the keyboard number in order to receive key input
 KeyBoardNum = GetKeyboardIndices; 
 
-    Screen('Preference', 'SkipSyncTests', 1); %1 skips the tests, 0 conducts them
+
+    Screen('Preference', 'SkipSyncTests', 2); %1 skips the tests, 0 conducts them
+    Screen('Preference', 'VisualDebugLevel', 3);%to suppress the PTB survey screen
     Screen('Preference', 'VBLTimestampingMode', 1);
     
     %you can either use the highest screen index in a multiple monitor
@@ -212,7 +214,7 @@ KeyBoardNum = GetKeyboardIndices;
 %% Start task block loop
         
     %show instruction screen
-    welcome=sprintf('Click left box for purple, right for orange, top for green\n\n\nPress "S" for same word, "D" for different\n\n\n\nPress space to begin the experiment \n \n \n');
+    welcome=sprintf('Click left box for purple, right for orange, top for green\n\n\nPress "S" for same side, "D" for different\n\n\n\nPress space to begin the experiment \n \n \n');
     DrawFormattedText(win, welcome, 'center', 'center', 0);
     Screen('Flip', win);
     %'Flip' called to put stimuli onto screen 
@@ -239,18 +241,19 @@ KeyBoardNum = GetKeyboardIndices;
             
             %making random two-dot arrays for L and R sides of screen 
             Lxy = zeros(2,2);
-            Lxy(1,1) = w/16 + rand(1)*(7*w/16-w/16);
-            Lxy(1,2) = w/16 + rand(1)*(7*w/16-w/16); 
-            Lxy(2,1) = h/16 + rand(1)*(15*h/16-h/16); 
-            Lxy(2,2) = h/16 + rand(1)*(15*h/16-h/16); 
+            Lxy(1,1) = w/16 + rand(1)*(6*w/16-2*w/16); % orig = w/16 + rand(1)*(7*w/16-w/16)
+            Lxy(1,2) = w/16 + rand(1)*(6*w/16-2*w/16); 
+            Lxy(2,1) = h/16 + rand(1)*(14*h/16-2*h/16); 
+            Lxy(2,2) = h/16 + rand(1)*(14*h/16-2*h/16); 
             Lcenter = [0, 0];
             
             Rxy = zeros(2,2);
-            Rxy(1,1) = 9*w/16 + rand(1)*(15*w/16-9*w/16);
-            Rxy(1,2) = 9*w/16 + rand(1)*(15*w/16-9*w/16); 
-            Rxy(2,1) = h/16 + rand(1)*(15*h/16-h/16); 
-            Rxy(2,2) = h/16 + rand(1)*(15*h/16-h/16); 
+            Rxy(1,1) = 9*w/16 + rand(1)*(14*w/16-10*w/16); % orig = 9*w/16 + rand(1)*(15*w/16-9*w/16)
+            Rxy(1,2) = 9*w/16 + rand(1)*(14*w/16-10*w/16); 
+            Rxy(2,1) = h/16 + rand(1)*(14*h/16-2*h/16); 
+            Rxy(2,2) = h/16 + rand(1)*(14*h/16-2*h/16); 
             Rcenter = [0, 0];
+            
             
             
             %show fixation
