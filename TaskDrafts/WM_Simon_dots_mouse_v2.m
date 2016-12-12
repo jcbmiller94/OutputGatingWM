@@ -158,15 +158,15 @@ KeyBoardNum = GetKeyboardIndices;
     stimRect = [centerX centerY xcorner ycorner];
     
     %this centers it on  particular location
-    centerRect = CenterRectOnPointd(stimRect, Xcenter, Yoffset);
+    centerRect = CenterRectOnPointd(stimRect, Xcenter, Ycenter);
     
     leftX = Xcenter-Xoffset;
     rightX = Xcenter+Xoffset;
     topY = Ycenter-((1/4)*screenYpixels);
     bottomY = Yoffset;
     
-    leftRect = CenterRectOnPointd(stimRect, leftX, bottomY);
-    rightRect = CenterRectOnPointd(stimRect, rightX, bottomY);
+    leftRect = CenterRectOnPointd(stimRect, leftX, Ycenter);
+    rightRect = CenterRectOnPointd(stimRect, rightX, Ycenter);
     topRect = CenterRectOnPointd(stimRect, Xcenter, topY);
 %     bottomRect = CenterRectOnPointd(stimRect, Xcenter, bottomY);
 
@@ -179,13 +179,13 @@ KeyBoardNum = GetKeyboardIndices;
     
     leftX1 = leftX - clickBoxSize;
     leftX2 = leftX + clickBoxSize;
-    leftY1 = bottomY - clickBoxSize;
-    leftY2 = bottomY + clickBoxSize;
+    leftY1 = Ycenter - clickBoxSize;
+    leftY2 = Ycenter + clickBoxSize;
     
     rightX1 = rightX - clickBoxSize;
     rightX2 = rightX + clickBoxSize;
-    rightY1 = bottomY - clickBoxSize;
-    rightY2 = bottomY + clickBoxSize;
+    rightY1 = Ycenter - clickBoxSize;
+    rightY2 = Ycenter + clickBoxSize;
     
     %topX1 = Xcenter - clickBoxSize;
     %topX2 = Xcenter + clickBoxSize;
@@ -235,15 +235,15 @@ KeyBoardNum = GetKeyboardIndices;
             Lxy = zeros(2,2);
             Lxy(1,1) = minX + rand(1)*(leftX2-leftX1);
             Lxy(1,2) = minX + rand(1)*(leftX2-leftX1); 
-            Lxy(2,1) = minY + rand(1)*(leftY2-leftY1);
-            Lxy(2,2) = minY + rand(1)*(leftY2-leftY1);   
+            Lxy(2,1) = minY + rand(1)*((bottomY+clickBoxSize)-(bottomY-clickBoxSize));
+            Lxy(2,2) = minY + rand(1)*((bottomY+clickBoxSize)-(bottomY-clickBoxSize));   
             Lcenter = [0, 0];
             
             Rxy = zeros(2,2);
             Rxy(1,1) = (w-minX-clickBoxSize) + rand(1)*(rightX2-rightX1);
             Rxy(1,2) = (w-minX-clickBoxSize) + rand(1)*(rightX2-rightX1);
-            Rxy(2,1) = minY + rand(1)*(leftY2-leftY1);
-            Rxy(2,2) = minY + rand(1)*(leftY2-leftY1);
+            Rxy(2,1) = minY + rand(1)*((bottomY+clickBoxSize)-(bottomY-clickBoxSize));
+            Rxy(2,2) = minY + rand(1)*((bottomY+clickBoxSize)-(bottomY-clickBoxSize));
             Rcenter = [0, 0];
             
             Txy = zeros(2,2);
@@ -367,7 +367,7 @@ KeyBoardNum = GetKeyboardIndices;
 
                     %puts mouse at center--but can be weird on multi-display
                     %setups
-                    SetMouse(Xcenter, Yoffset);
+                    SetMouse(Xcenter, Ycenter);
                     [~, cueStart] = Screen('Flip', win);
 
                     enterResp=false;
@@ -564,7 +564,7 @@ KeyBoardNum = GetKeyboardIndices;
             
             [minSmoothPointSize, maxSmoothPointSize, minAliasedPointSize, maxAliasedPointSize] = Screen('DrawDots', win, xy, 15, [0 0 0], center, 1);
             %DrawFormattedText(win, ProbeSide, 'center', 'center', 0);
-            DrawFormattedText(win, '?', 'center', centerY+100, 0);
+            DrawFormattedText(win, '?', 'center', 'center', 0);
             Screen('Flip', win);
             %WaitSecs(WMProbe);            
 
