@@ -90,12 +90,12 @@ KeyBoardNum = GetKeyboardIndices;
 
     ITI = 1; % orig = 1
     SampleShow = 1;
-    WMDelay = 2; %orig = 1.5
+    WMDelay = 1.5; %orig = 1.5
     responseDeadline = 3; %orig = 4
     WMProbe = 2; %orig = 2
     
-    BlockNum = 1; %4
-    TrialNum = 6; %30
+    BlockNum = 2; %4
+    TrialNum = 4; %30
     
     %change detection response keys
     matchResp = 's';
@@ -422,16 +422,18 @@ KeyBoardNum = GetKeyboardIndices;
                         
                         %if cursor moves into correct box for the FIRST time
                         % center position, get the time of that movement 
+                        %enter_box = 0;
                         if cursor_in_box == false                          
                             if correctResp == leftResp && current_pos(1) > leftX1 && current_pos(1) < leftX2 && current_pos(2) > leftY1 && current_pos(2) < leftY2
                                 enter_box = GetSecs; 
                                 cursor_in_box = true; 
                             elseif correctResp == rightResp && current_pos(1) > rightX1 && current_pos(1) < rightX2 && current_pos(2) > rightY1 && current_pos(2) < rightY2
                                 enter_box = GetSecs; 
-                                cursor_in_box = true;                                
+                                cursor_in_box = true;  
+                            else enter_box = 0; 
                             end 
-                        elseif cursor_in_box ==true
-                        else enter_box = 0; 
+                        elseif cursor_in_box == true
+                        %else enter_box = 0; 
                         end
                         
                         % break the response loop after a designated
