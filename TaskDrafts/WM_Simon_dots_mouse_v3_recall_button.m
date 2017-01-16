@@ -333,8 +333,8 @@ KeyBoardNum = GetKeyboardIndices;
                 case 2 %incompatible
                     TrialType = 'incompatible';
                     
-                    if CurrentSampleIndex == 1
-                        CurrentSample = leftWord;
+                    if CurrentSampleIndex == 2
+                        CurrentSample = rightWord;
                         
                        if CurrentColorIndex == 1; % Color of cue 
                           CurrentMotor = rightRGB1;
@@ -349,8 +349,8 @@ KeyBoardNum = GetKeyboardIndices;
                         xy = Lxy; %left dot array 
                         center = Lcenter;
                         
-                    elseif CurrentSampleIndex == 2
-                        CurrentSample = rightWord;
+                    elseif CurrentSampleIndex == 1
+                        CurrentSample = leftWord;
                         
                        if CurrentColorIndex == 1; % Color of cue 
                           CurrentMotor = leftRGB1;
@@ -430,10 +430,22 @@ KeyBoardNum = GetKeyboardIndices;
                     cursor_moved = false; 
                     cursor_in_box = false; 
                     
+                    % SAMPLING RATE 
+                    % code for setting a constant sampling rate of the while loop for getting mouse position 
+                    tic;
+                    begintime = GetSecs;
+                    nextsampletime = begintime;
+                    k = 0;
+                    desiredSampleRate = 60; 
+                    
+                    
+                    % LOOP FOR COLLECTING MOUSE RESPONSE DATA FOR MOTOR
+                    % TASK 
                     % this loop will listen for clicks inside the boxes
                     %  associated with the color cue
                     while enterResp==false                        
-                   
+                        
+                        % CLICK SECTION 
                         %[~, responseX, responseY, buttons] = GetClicks(win, 0);%gives coords of each click                         
                         [responseX, responseY, mouseClick] = GetMouse;
                         
@@ -458,11 +470,22 @@ KeyBoardNum = GetKeyboardIndices;
                             end                                                 
                         end
                         
+                        % MOUSE POSITION SECTION 
                         % recording the coordinates of the cursor until the loop is broken with click inside a box 
                         [x,y,buttons] = GetMouse(win);
                         current_pos = [x, y, buttons];
                         trial_path = [trial_path; current_pos];
                         
+                        % SAMPLING RATE  
+                        k = k+1;   
+                        t(k) = GetSecs - begintime;
+                        
+                        sampletime(k) = GetSecs;
+                        nextsampletime = nextsampletime + 1/desiredSampleRate;
+                        while GetSecs < nextsampletime
+                        end
+                        
+                        % RECORDING INITIAL MOVEMENT TIME 
                         %if cursor moves for the FIRST time from the
                         % center position, get the time of that movement 
                         if cursor_moved == false && isequal(current_pos(1:2),trial_path(1,1:2)) == 0
@@ -472,6 +495,7 @@ KeyBoardNum = GetKeyboardIndices;
                         else move_init = 0;
                         end 
                         
+                        % RECORDING TIME ENTERING THE BOX 
                         %if cursor moves into correct box for the FIRST time
                         % center position, get the time of that movement 
                         %enter_box = 0;
@@ -488,6 +512,7 @@ KeyBoardNum = GetKeyboardIndices;
                         %else enter_box = 0; 
                         end
                         
+                        % BREAK LOOP AFTER RESPONSE DEADLINE HAS PASSED 
                         % break the response loop after a designated
                         % deadline
                         if GetSecs - cueStart > responseDeadline 
@@ -495,6 +520,15 @@ KeyBoardNum = GetKeyboardIndices;
                         end
                         
                     end
+                    
+                    % GET DATA FOR ACTUAL WHILE LOOP TIMING 
+                    % timing for sampling rate 
+                    endtime = GetSecs; 
+                    elapsedTime = endtime - begintime; 
+                    numberOfSamples = k; 
+                    actualSampleRate = 1/(elapsedTime / numberOfSamples); 
+                    %disp(actualSampleRate); 
+                    disp(sprintf('Actual sample rate: %d', actualSampleRate)); 
                     
                     %save the trial path to the cell array of paths for
                     %each trial 
