@@ -98,10 +98,11 @@ KeyBoardNum = GetKeyboardIndices;
     SampleShow = 1;
     WMDelay = 2; %orig = 1.5
     responseDeadline = 3; %orig = 4
+    probeDelay = 1; 
     WMProbe = 2; %orig = 2
     
     BlockNum = 1; %4
-    TrialNum = 10; %30
+    TrialNum = 4; %30
     
     %change detection response keys
     leftProbeResp = 'L';
@@ -215,8 +216,8 @@ KeyBoardNum = GetKeyboardIndices;
     fixCenter = CenterRectOnPointd(fixRect, Xcenter, Ycenter);
     
     % read images for use as WM stimuli 
-    left_image = imread('left_arrow.png', 'BackgroundColor', [1 1 1]); 
-    right_image = imread('right_arrow.png', 'BackgroundColor', [1 1 1]); 
+    left_image = imread('left_arrow_copy.png'); 
+    right_image = imread('right_arrow_copy.png'); 
     left_image = imresize(left_image, 0.8); 
     right_image = imresize(right_image, 0.8); 
     
@@ -333,7 +334,7 @@ KeyBoardNum = GetKeyboardIndices;
                           cueColor = leftColor2; 
                        end  
                       
-                        correctResp = leftResp;
+                        correctResp = rightResp;
                         
                         texture = right_texture;  % incompatible image direction
                         
@@ -349,7 +350,7 @@ KeyBoardNum = GetKeyboardIndices;
                           cueColor = rightColor2; 
                        end    
                       
-                        correctResp = rightResp;   
+                        correctResp = leftResp;   
                         
                         texture = left_texture; 
                     end
@@ -492,7 +493,7 @@ KeyBoardNum = GetKeyboardIndices;
                     numberOfSamples = k; 
                     actualSampleRate = 1/(elapsedTime / numberOfSamples); 
                     %disp(actualSampleRate); 
-                    disp(sprintf('Actual sample rate: %d', actualSampleRate)); 
+                    %disp(sprintf('Actual sample rate: %d', actualSampleRate)); 
                     
                     %save the trial path to the cell array of paths for
                     %each trial 
@@ -548,14 +549,14 @@ KeyBoardNum = GetKeyboardIndices;
                 
             DrawFormattedText(win, '+', 'center', 'center', 0);
             Screen('Flip', win);
-            WaitSecs(WMDelay); 
+            WaitSecs(probeDelay); 
             
-                % determine whether L or R response is the correct response
-                if CurrentSampleIndex == 1
-                    correctProbeResp = leftProbeResp; 
-                elseif CurrentSampleIndex == 2
-                    correctProbeResp = rightProbeResp;  
-                end
+            % determine whether L or R response is the correct response
+            if CurrentSampleIndex == 1
+                correctProbeResp = leftProbeResp; 
+            elseif CurrentSampleIndex == 2
+                correctProbeResp = rightProbeResp;  
+            end
                 
             
             %[minSmoothPointSize, maxSmoothPointSize, minAliasedPointSize, maxAliasedPointSize] = Screen('DrawDots', win, xy, 15, [0 0 0], center, 1);
@@ -683,7 +684,7 @@ KeyBoardNum = GetKeyboardIndices;
                     %calculate RT, time from the start of the cue to the
                     %response click
                     probert = GetSecs - probeTime;
-                    probemsecRT=round(1000*rt);
+                    probemsecRT=round(1000*probert);
                     
                     if probemsecRT > (WMProbe*1000)-1
                         probemsecRT = 'Time-out';
@@ -710,7 +711,8 @@ KeyBoardNum = GetKeyboardIndices;
                     box_rt = enter_box - probeTime; 
                     if enter_box == 0
                         box_rt = 0;
-                    end                 
+                    end       
+                    
                     probe_enter_box_msecRT = round(1000*box_rt); 
                     if probe_enter_box_msecRT == 0
                         probe_enter_box_msecRT = 'No-move';

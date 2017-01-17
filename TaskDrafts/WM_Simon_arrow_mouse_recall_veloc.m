@@ -98,10 +98,11 @@ KeyBoardNum = GetKeyboardIndices;
     SampleShow = 1;
     WMDelay = 2; %orig = 1.5
     responseDeadline = 3; %orig = 4
+    probeDelay = 1;
     WMProbe = 2; %orig = 2
     
     BlockNum = 1; %4
-    TrialNum = 10; %30
+    TrialNum = 4; %30
     
     %change detection response keys
     leftProbeResp = 'L';
@@ -215,8 +216,8 @@ KeyBoardNum = GetKeyboardIndices;
     fixCenter = CenterRectOnPointd(fixRect, Xcenter, Ycenter);
     
     % read images for use as WM stimuli 
-    left_image = imread('left_arrow.png', 'BackgroundColor', [1 1 1]); 
-    right_image = imread('right_arrow.png', 'BackgroundColor', [1 1 1]); 
+    left_image = imread('left_arrow_copy.png'); 
+    right_image = imread('right_arrow_copy.png'); 
     left_image = imresize(left_image, 0.8); 
     right_image = imresize(right_image, 0.8);
     
@@ -333,7 +334,7 @@ KeyBoardNum = GetKeyboardIndices;
                           cueColor = leftColor2; 
                        end  
                       
-                        correctResp = leftResp;
+                        correctResp = rightResp;
                         
                         texture = right_texture;  % incompatible image direction
                         
@@ -349,7 +350,7 @@ KeyBoardNum = GetKeyboardIndices;
                           cueColor = rightColor2; 
                        end    
                       
-                        correctResp = rightResp;   
+                        correctResp = leftResp;   
                         
                         texture = left_texture; 
                     end
@@ -495,7 +496,7 @@ KeyBoardNum = GetKeyboardIndices;
                         elseif current_pos(1) > rightX1 && current_pos(1) < rightX2 && current_pos(2) > rightY1 && current_pos(2) < rightY2
                                 if v < veloc_thresh
                                     enterResp = true;
-                                    resp = leftResp; 
+                                    resp = rightResp; 
                                 end
                         else enterResp=false;
                         end
@@ -517,7 +518,7 @@ KeyBoardNum = GetKeyboardIndices;
                     numberOfSamples = k; 
                     actualSampleRate = 1/(elapsedTime / numberOfSamples); 
                     %disp(actualSampleRate); 
-                    disp(sprintf('Actual sample rate: %d', actualSampleRate)); 
+                    %disp(sprintf('Actual sample rate: %d', actualSampleRate)); 
                     
                     %save the trial path to the cell array of paths for
                     %each trial 
@@ -573,7 +574,7 @@ KeyBoardNum = GetKeyboardIndices;
                 
             DrawFormattedText(win, '+', 'center', 'center', 0);
             Screen('Flip', win);
-            WaitSecs(WMDelay); 
+            WaitSecs(probeDelay); 
             
                 % determine whether L or R response is the correct response
                 if CurrentSampleIndex == 1
@@ -708,7 +709,7 @@ KeyBoardNum = GetKeyboardIndices;
                         elseif current_pos(1) > rightX1 && current_pos(1) < rightX2 && current_pos(2) > rightY1 && current_pos(2) < rightY2
                                 if v < veloc_thresh
                                     enterResp = true;
-                                    probeResp = leftResp; 
+                                    probeResp = rightResp; 
                                 end
                         else enterResp=false;
                         end
@@ -730,7 +731,7 @@ KeyBoardNum = GetKeyboardIndices;
                     %calculate RT, time from the start of the cue to the
                     %response click
                     probert = GetSecs - probeTime;
-                    probemsecRT=round(1000*rt);
+                    probemsecRT=round(1000*probert);
                     
                     if probemsecRT > (WMProbe*1000)-1
                         probemsecRT = 'Time-out';
