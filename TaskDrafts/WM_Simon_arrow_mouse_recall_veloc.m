@@ -401,8 +401,8 @@ KeyBoardNum = GetKeyboardIndices;
                     begintime = GetSecs;
                     nextsampletime = begintime;
                     k = 0;
-                    desiredSampleRate = 50; % in Hz  
-                    veloc_thresh = 12; 
+                    desiredSampleRate = 125; % in Hz  
+                    veloc_thresh = 15; 
                     
                     
                     % LOOP FOR COLLECTING MOUSE RESPONSE DATA FOR MOTOR
@@ -480,10 +480,20 @@ KeyBoardNum = GetKeyboardIndices;
                         
                         % CALCULATING VELOCITY 
                                         
-                        if k > 2
-                            vx = diff(trial_path(k-1:k,1));
-                            vy = diff(trial_path(k-1:k,1));
-                            v = sqrt(vx.^2 + vy.^2);
+                        if k > 6
+                            
+                            mx = diff(trial_path(k-5:k,1)); % motion in x direction 
+                            my = diff(trial_path(k-5:k,2)); % motion in y direction 
+                            m = sqrt(mx.^2 + my.^2); % displacement vector length 
+                            v = mean(abs(diff(m))); % mean of the absolute value of velocity (speed) for last 5 data points sampled 
+                             
+%                             mvx = diff(trial_path(k-1:k,1)); 
+%                             mvy = diff(trial_path(k-1:k,2)); 
+%                             mv = sqrt(mvx.^2 + mvy.^2);                              
+%                             v = diff(mv);                                                         
+%                             vx = diff(trial_path(k-1:k,1));
+%                             vy = diff(trial_path(k-1:k,2));
+%                             v = sqrt(vx.^2 + vy.^2);
                         end 
                         
                         % check if cursor is in BOX and velocity is below
@@ -616,7 +626,7 @@ KeyBoardNum = GetKeyboardIndices;
                     begintime = GetSecs;
                     nextsampletime = begintime;
                     k = 0;
-                    %desiredSampleRate = 60; 
+                    desiredSampleRate = 125; 
                     
                     
                     % LOOP FOR COLLECTING MOUSE RESPONSE DATA FOR MOTOR
@@ -693,10 +703,16 @@ KeyBoardNum = GetKeyboardIndices;
                         end
                         
                         % CALCULATING VELOCITY                                       
-                        if k > 2
-                            vx = diff(trial_path(k-1:k,1));
-                            vy = diff(trial_path(k-1:k,1));
-                            v = sqrt(vx.^2 + vy.^2);
+                        if k > 6
+%                             vx = diff(trial_path(k-1:k,1));
+%                             vy = diff(trial_path(k-1:k,1));
+%                             v = sqrt(vx.^2 + vy.^2);
+                            
+                            mx = diff(trial_path(k-5:k,1)); % motion in x direction 
+                            my = diff(trial_path(k-5:k,2)); % motion in y direction 
+                            m = sqrt(mx.^2 + my.^2); % displacement vector length 
+                            v = mean(abs(diff(m))); % mean of the absolute value of velocity (speed) for last 5 data points sampled 
+                            
                         end 
                         
                         % check if cursor is in BOX and velocity is below
