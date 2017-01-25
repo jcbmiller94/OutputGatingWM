@@ -16,33 +16,33 @@ rng('shuffle');
 
 KbName('UnifyKeyNames'); 
     
-%message pops up in the command window to ask for subject number   
-subject = input('Enter SUBJECT number ', 's');
-
-%name of data output file 
-datafilename = strcat('MotorData/WM_Simon_arrow_mouse_recall_veloc_', subject, '.txt'); 
-
-%if a file with that same info already exists in the data folder, give a
-%new subject #, or overwrite the existing file
-if exist(datafilename)==2
-    disp ('A file with this name already exists')
-    overwrite = input('overwrite?, y/n \n', 's');
-    if strcmpi(overwrite, 'n')
-        %disp('enter new subject number');
-        newsub = input('New SUBJECT number? ', 's');
-        datafilename = strcat('MotorData/WM_Simon_arrow_mouse_recall_', newsub, '.txt');
-    end
-end
-
-%make a space-delimited text output file where each trial is a row
-%(I just happen to like using text files, but you can output the data in
-%any way that will work the best for your preferred analysis style)
-fid = fopen(datafilename, 'w');
-fprintf(fid, 'subject block trial CurrentCondition TrialType CurrentSampleIndex CurrentSample cueColor correctResp Resp ACC msecRT move_init_msecRT enter_box_msecRT correctProbeResp probeResp probeACC probemsecRT probe_move_init_msecRT probe_enter_box_msecRT\n');
-
-% make a cell array to hold data for tracking the cursor path 
-%  in this cell array, each row is a block and each column is a trial
-%  (each element being the path for that trial in that block)
+% %message pops up in the command window to ask for subject number   
+% subject = input('Enter SUBJECT number ', 's');
+% 
+% %name of data output file 
+% datafilename = strcat('MotorData/WM_Simon_arrow_mouse_recall_veloc_', subject, '.txt'); 
+% 
+% %if a file with that same info already exists in the data folder, give a
+% %new subject #, or overwrite the existing file
+% if exist(datafilename)==2
+%     disp ('A file with this name already exists')
+%     overwrite = input('overwrite?, y/n \n', 's');
+%     if strcmpi(overwrite, 'n')
+%         %disp('enter new subject number');
+%         newsub = input('New SUBJECT number? ', 's');
+%         datafilename = strcat('MotorData/WM_Simon_arrow_mouse_recall_', newsub, '.txt');
+%     end
+% end
+% 
+% %make a space-delimited text output file where each trial is a row
+% %(I just happen to like using text files, but you can output the data in
+% %any way that will work the best for your preferred analysis style)
+% fid = fopen(datafilename, 'w');
+% fprintf(fid, 'subject block trial CurrentCondition TrialType CurrentSampleIndex CurrentSample cueColor correctResp Resp ACC msecRT move_init_msecRT enter_box_msecRT correctProbeResp probeResp probeACC probemsecRT probe_move_init_msecRT probe_enter_box_msecRT\n');
+% 
+% % make a cell array to hold data for tracking the cursor path 
+% %  in this cell array, each row is a block and each column is a trial
+% %  (each element being the path for that trial in that block)
 
 cursor_path = {};
 cursor_path_probe = {};
@@ -101,8 +101,11 @@ KeyBoardNum = GetKeyboardIndices;
     probeDelay = 1;
     WMProbe = 2; %orig = 2
     
+    feedback = 1;
+
+    
     BlockNum = 1; %4
-    TrialNum = 8; %30
+    TrialNum = 4; %30
     
     %change detection response keys
     leftProbeResp = 'L';
@@ -251,6 +254,39 @@ KeyBoardNum = GetKeyboardIndices;
 %% Start task block loop
         
     %show instruction screen
+       
+    instructions=sprintf(['This is a practice of the experiment you will be doing\n\n\nAn arrow will appear pointing to the right or left side of the screen\n\n\n' ... 
+        'Remember the direction the arrow points....\n\n\n(Press space to continue)']) 
+    DrawFormattedText(win, instructions, 'center', 'center', 0);
+    Screen('Flip', win);    
+    if IsOSX
+        getKey('space', KeyBoardNum); %OSX requires a device number whereas windows requires none
+    else
+        getKey('space');
+    end
+    
+        instructions=sprintf(['Two boxes will then appear, with your cursor on the middle of the screen\n\n\n Based on the color of the middle box, move cursor to one of the other boxes\n\n' ... 
+    'green or pink: left box\n\norange or blue: right box\n\n\n(Press space to continue)']) 
+    DrawFormattedText(win, instructions, 'center', 'center', 0);
+    Screen('Flip', win);    
+    if IsOSX
+        getKey('space', KeyBoardNum); %OSX requires a device number whereas windows requires none
+    else
+        getKey('space');
+    end  
+    
+
+    instructions=sprintf(['On the next screen, you will be asked to indicate the arrow direction \n\n\n Move the cursor to the left or right box to indicate the arrow direction\n\n\n(Press space to continue)'])
+    DrawFormattedText(win, instructions, 'center', 'center', 0);
+    Screen('Flip', win);    
+    if IsOSX
+        getKey('space', KeyBoardNum); %OSX requires a device number whereas windows requires none
+    else
+        getKey('space');
+    end  
+    
+    
+    
     welcome=sprintf('Move to left box for green or pink \n           right box for orange or blue \n\n\nThen, move to box where arrow pointed\n\n\n\n\nPress space to begin the experiment \n \n \n');
     DrawFormattedText(win, welcome, 'center', 'center', 0);
     Screen('Flip', win);
@@ -590,12 +626,26 @@ KeyBoardNum = GetKeyboardIndices;
                 %calculate accuracy
                 Accuracy = strcmp(resp,correctResp); 
 
+%                 if Accuracy == 1 
+%                     ACC = 1;
+%                 else ACC = 0;
+%                 end            
+                       
+               % show feedback for practice 
+                
                 if Accuracy == 1 
                     ACC = 1;
+                    DrawFormattedText(win, 'Correct!', 'center', 'center', 0);
+                    Screen('Flip', win); 
+                    WaitSecs(feedback);
                 else ACC = 0;
-                end            
-                       
-            
+                    DrawFormattedText(win, 'Incorrect', 'center', 'center', 0);
+                    Screen('Flip', win); 
+                    WaitSecs(feedback);
+                end  
+                
+                
+                
             HideCursor;
                 
             DrawFormattedText(win, '+', 'center', 'center', 0);
@@ -792,12 +842,29 @@ KeyBoardNum = GetKeyboardIndices;
                     
                 %calculate accuracy
                 probeAccuracy = strcmp(probeResp,correctProbeResp); 
-
+% 
+%                 if probeAccuracy == 1 
+%                     probeACC = 1;
+%                 else probeACC = 0;
+%                 end            
+                       
                 if probeAccuracy == 1 
                     probeACC = 1;
+                    DrawFormattedText(win, 'Correct!', 'center', 'center', 0);
+                    Screen('Flip', win); 
+                    WaitSecs(feedback);
                 else probeACC = 0;
+                    DrawFormattedText(win, 'Incorrect', 'center', 'center', 0);
+                    Screen('Flip', win); 
+                    WaitSecs(feedback);
                 end            
-                       
+            
+                %let them know that they have completed one trial
+                if trial == 1
+                    DrawFormattedText(win, 'You completed one practice trial!\n\n\nNow, you will complete several trials in a row', 'center', 'center', 0);
+                    Screen('Flip', win); 
+                    WaitSecs(2);
+                end 
             
             HideCursor;
               
@@ -863,27 +930,27 @@ KeyBoardNum = GetKeyboardIndices;
                                                
         %add movement initiation time and data type
         %print trial info to data file
-            fprintf(fid,'%s %i %i %i %s %d %s %s %s %s %d %s %s %s %s %s %d %s %s %s\n',...
-            subject,...
-            block,...
-            trial,... 
-            CurrentCondition,...
-            TrialType,...
-            CurrentSampleIndex,...
-            CurrentSample,...
-            cueColor,...
-            correctResp,...
-            resp,...
-            ACC,...
-            msecRT,...
-            move_init_msecRT,...
-            enter_box_msecRT,...
-            correctProbeResp,...
-            probeResp,...
-            probeACC,...
-            probemsecRT,...
-            probe_move_init_msecRT,...
-            probe_enter_box_msecRT);
+%             fprintf(fid,'%s %i %i %i %s %d %s %s %s %s %d %s %s %s %s %s %d %s %s %s\n',...
+%             subject,...
+%             block,...
+%             trial,... 
+%             CurrentCondition,...
+%             TrialType,...
+%             CurrentSampleIndex,...
+%             CurrentSample,...
+%             cueColor,...
+%             correctResp,...
+%             resp,...
+%             ACC,...
+%             msecRT,...
+%             move_init_msecRT,...
+%             enter_box_msecRT,...
+%             correctProbeResp,...
+%             probeResp,...
+%             probeACC,...
+%             probemsecRT,...
+%             probe_move_init_msecRT,...
+%             probe_enter_box_msecRT);
     
         end
     
@@ -917,11 +984,11 @@ KeyBoardNum = GetKeyboardIndices;
 
 
 %name of data output file 
-cursor_data_filename = strcat('MotorData/WM_Simon_arrow_mouse_recall_veloc_', subject, '_cursor_data.mat'); 
-save(cursor_data_filename, 'cursor_path'); 
-
-cursor_data_filename_probe = strcat('MotorData/WM_Simon_arrow_mouse_recall_veloc_', subject, '_cursor_probe_data.mat'); 
-save(cursor_data_filename_probe, 'cursor_path_probe'); 
+% cursor_data_filename = strcat('MotorData/WM_Simon_arrow_mouse_recall_veloc_', subject, '_cursor_data.mat'); 
+% save(cursor_data_filename, 'cursor_path'); 
+% 
+% cursor_data_filename_probe = strcat('MotorData/WM_Simon_arrow_mouse_recall_veloc_', subject, '_cursor_probe_data.mat'); 
+% save(cursor_data_filename_probe, 'cursor_path_probe'); 
 
 
 ListenChar(0);
