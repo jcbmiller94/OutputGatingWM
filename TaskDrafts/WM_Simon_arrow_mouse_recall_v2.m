@@ -6,7 +6,7 @@
 %
 %
 
-function WM_Simon_arrow_mouse_recall_veloc 
+function WM_Simon_arrow_mouse_recall_v2
 
 %%% timestamp movement onset and add to results printout 
 
@@ -20,7 +20,7 @@ KbName('UnifyKeyNames');
 subject = input('Enter SUBJECT number ', 's');
 
 %name of data output file 
-datafilename = strcat('MotorData/WM_Simon_arrow_mouse_recall_veloc_', subject, '.txt'); 
+datafilename = strcat('MotorData/WM_Simon_arrow_mouse_recall_v2_', subject, '.txt'); 
 
 %if a file with that same info already exists in the data folder, give a
 %new subject #, or overwrite the existing file
@@ -30,7 +30,7 @@ if exist(datafilename)==2
     if strcmpi(overwrite, 'n')
         %disp('enter new subject number');
         newsub = input('New SUBJECT number? ', 's');
-        datafilename = strcat('MotorData/WM_Simon_arrow_mouse_recall_', newsub, '.txt');
+        datafilename = strcat('MotorData/WM_Simon_arrow_mouse_recall_v2_', newsub, '.txt');
     end
 end
 
@@ -98,7 +98,7 @@ KeyBoardNum = GetKeyboardIndices;
     SampleShow = 1;
     WMDelay = 2; %orig = 1.5
     responseDeadline = 3; %orig = 4
-    probeDelay = 1;
+    probeDelay = 1; 
     WMProbe = 2; %orig = 2
     
     BlockNum = 1; %4
@@ -159,33 +159,30 @@ KeyBoardNum = GetKeyboardIndices;
     w = wRect(3);
     centerX = wRect(3)/2;
     centerY = wRect(4)/2; 
-
     
     % get width and height of screen in pixels
     [screenXpixels, screenYpixels] = Screen('WindowSize', win);
     % get width and height of screen in millimeters 
     [width_mm, height_mm]=Screen('DisplaySize', screenNumber);
     
-    pixels_per_mm = screenXpixels/width_mm; 
-    mm_per_pixel = width_mm/screenXpixels; 
-    
+    % center of the screen as half of the height and width 
     Xcenter = screenXpixels/2;
     Ycenter = screenYpixels/2;    
     
-    %change this to move the location of the spatial stimuli
+    % location of the spatial stimuli
     Xoffset = screenXpixels/4;
     Yoffset = screenYpixels/4;
     %Xoffset = (1/2)*screenYpixels; %screenXpixels
     %Yoffset = (3/4)*screenYpixels;
+    
+    % bounding circle distance (pixels), once the cursor moves this
+    %  distance form the center, movement initation time is recorded 
+    boundDistance = 75; 
  
     %Make a destination rectangle for stimuli
     stimSize = 150; %orig = 100
     xcorner = centerX+stimSize;
     ycorner = centerY+stimSize;
-    
-    % bounding circle distance (pixels), once the cursor moves this
-    %  distance form the center, movement initation time is recorded 
-    boundDistance = 75; % in pixels, 1/2 the stim size 
     
     %this is the general rect size we'll use for all stims
     stimRect = [centerX centerY xcorner ycorner];
@@ -231,7 +228,7 @@ KeyBoardNum = GetKeyboardIndices;
     left_image = imread('left_arrow_copy.png'); 
     right_image = imread('right_arrow_copy.png'); 
     left_image = imresize(left_image, 0.8); 
-    right_image = imresize(right_image, 0.8);
+    right_image = imresize(right_image, 0.8); 
     
     % Get the size of the images 
     [s1, s2, s3] = size(left_image);
@@ -251,7 +248,7 @@ KeyBoardNum = GetKeyboardIndices;
 %% Start task block loop
         
     %show instruction screen
-    welcome=sprintf('Move to left box for green or pink \n           right box for orange or blue \n\n\nThen, move to box where arrow pointed\n\n\n\n\nPress space to begin the experiment \n \n \n');
+    welcome=sprintf('Click on left box for green or pink \n           right box for orange or blue \n\n\nThen, click box side where arrow pointed\n\n\n\n\nPress space to begin the experiment \n \n \n');
     DrawFormattedText(win, welcome, 'center', 'center', 0);
     Screen('Flip', win);
     %'Flip' called to put stimuli onto screen 
@@ -312,7 +309,8 @@ KeyBoardNum = GetKeyboardIndices;
                           cueColor = leftColor2; 
                        end                       
                        
-                       correctResp = leftResp;          
+                       correctResp = leftResp; % response to motor cue 
+                       %correctProbeResp = leftResp; % response to probe (arrow direction)
                        % assign image to present
                        texture = left_texture; 
                         
@@ -328,7 +326,7 @@ KeyBoardNum = GetKeyboardIndices;
                        end  
                        
                        correctResp = rightResp;
-                        
+                       %correctProbeResp = rightResp;
                        texture = right_texture;                       
                     end 
                     
@@ -346,8 +344,8 @@ KeyBoardNum = GetKeyboardIndices;
                           cueColor = leftColor2; 
                        end  
                       
-                        correctResp = rightResp;
-                        
+                        correctResp = leftResp; % correct motor response direction
+                        %correctProbeResp = rightResp;
                         texture = right_texture;  % incompatible image direction
                         
                         
@@ -362,8 +360,8 @@ KeyBoardNum = GetKeyboardIndices;
                           cueColor = rightColor2; 
                        end    
                       
-                        correctResp = leftResp;   
-                        
+                        correctResp = rightResp;   
+                       % correctProbeResp = leftResp;
                         texture = left_texture; 
                     end
             end
@@ -405,7 +403,7 @@ KeyBoardNum = GetKeyboardIndices;
 
                     trial_path = [];
                     cursor_dist = [];
-                    cursor_v = [];
+                    %cursor_v = [];
                     cursor_moved = false; 
                     cursor_in_box = false; 
                     
@@ -415,8 +413,7 @@ KeyBoardNum = GetKeyboardIndices;
                     begintime = GetSecs;
                     nextsampletime = begintime;
                     k = 0;
-                    desiredSampleRate = 500; % in Hz  % Set to 500
-                   %veloc_thresh = 15; 
+                    desiredSampleRate = 1000; % in Hz  
                     
                     
                     % LOOP FOR COLLECTING MOUSE RESPONSE DATA FOR MOTOR
@@ -425,27 +422,41 @@ KeyBoardNum = GetKeyboardIndices;
                     %  associated with the color cue
                     while enterResp==false                        
                         
-                        k = k+1;
+                        k = k+1;  % tracking moving through loop with k
+
+                        % CLICK SECTION 
+                        %[~, responseX, responseY, buttons] = GetClicks(win, 0);%gives coords of each click                         
+                        [responseX, responseY, mouseClick] = GetMouse;
+                        
+                        %if any(buttons)                        
+                        if mouseClick(1) == 1
+                        
+                            % if a click falls within the response box range, response is entered 
+                            if responseX > leftX1 && responseX < leftX2 && responseY > leftY1 && responseY < leftY2
+                                enterResp = true;
+                                resp = leftResp;                                   
+                                
+                            elseif responseX > rightX1 && responseX < rightX2 && responseY > rightY1 && responseY < rightY2
+                                enterResp = true;
+                                resp = rightResp;
+                                
+                            %elseif responseX > topX1 && responseX < topX2 && responseY > topY1 && responseY < topY2
+                             %   enterResp = true;
+                              %  resp = upResp;              
+                                
+                            % if a click surrounds the response box, but doesn't fall inside it, do nothing     
+                            else enterResp=false;   
+                            end                                                 
+                        end
                         
                         % MOUSE POSITION SECTION 
                         % recording the coordinates of the cursor until the loop is broken with click inside a box 
                         [x,y,buttons] = GetMouse(win);
                         current_pos = [x, y, buttons];
                         trial_path = [trial_path; current_pos];
-                    
+                        
                         % calculating distance cursor has moved 
                         cursor_dist(k) = sqrt((x-Xcenter)^2 + (y-Ycenter)^2);
-                        if k >=6
-                            % v is calculated by looking at distance traveled over 5 samples
-                            %  (which should equal 10 ms if sampling at 500 Hz); 
-                            %  (given USB sampling rate limit of 125 Hz, this
-                            %   must be greater than 8 ms); 
-                            % converting into mm/sec requires dividing by .01 (10 ms in s) 
-                            %  and multiplying by (mm/pixel) conversion factor
-                            cursor_v(k) = (((cursor_dist(k)-cursor_dist(k-5))/(.01))*mm_per_pixel);
-                        else
-                            cursor_v(k) = nan;
-                        end          
 
                         % RECORDING INITIAL MOVEMENT TIME 
                         % if cursor moves farther away than the bounding distance
@@ -456,7 +467,7 @@ KeyBoardNum = GetKeyboardIndices;
                         elseif cursor_moved == true
                         else move_init = 0;
                         end 
-                        
+     
                         % RECORDING TIME ENTERING THE BOX 
                         %if cursor moves into correct box for the FIRST time
                         % center position, get the time of that movement 
@@ -464,7 +475,7 @@ KeyBoardNum = GetKeyboardIndices;
                         if cursor_in_box == false                          
                             if correctResp == leftResp && current_pos(1) > leftX1 && current_pos(1) < leftX2 && current_pos(2) > leftY1 && current_pos(2) < leftY2
                                 enter_box = GetSecs; 
-                                cursor_in_box = true;  
+                                cursor_in_box = true; 
                             elseif correctResp == rightResp && current_pos(1) > rightX1 && current_pos(1) < rightX2 && current_pos(2) > rightY1 && current_pos(2) < rightY2
                                 enter_box = GetSecs; 
                                 cursor_in_box = true;  
@@ -474,50 +485,7 @@ KeyBoardNum = GetKeyboardIndices;
                         %else enter_box = 0; 
                         end
                         
-                        % CALCULATING VELOCITY 
-%                                         
-%                         if k > 6
-%                             
-%                             mx = diff(trial_path(k-5:k,1)); % motion in x direction 
-%                             my = diff(trial_path(k-5:k,2)); % motion in y direction 
-%                             m = sqrt(mx.^2 + my.^2); % displacement vector length 
-%                             v = mean(abs(diff(m))); % mean of the absolute value of velocity (speed) for last 5 data points sampled 
-%                              
-%                             % change movement initiation to a given distance (100 pixels?) 
-%                             
-%                             % track distance of movement from center point 
-%                             % distance = sqrt((x - Xcenter)^2 + (y - Ycenter)^2)
-%                             % divide difference in hand distance (k-4 to k, 500 Hz sampling to 125 Hz polling limite) between two time points 
-%                             % by length of time in seconds (pixels/second) (multiply by pixel to mm conversion) 
-%                             % if all() samples for given time are below velocity threshold (play around with number), advance 
-%                             
-% %                             mvx = diff(trial_path(k-1:k,1)); 
-% %                             mvy = diff(trial_path(k-1:k,2)); 
-% %                             mv = sqrt(mvx.^2 + mvy.^2);                              
-% %                             v = diff(mv);                                                         
-% %                             vx = diff(trial_path(k-1:k,1));
-% %                             vy = diff(trial_path(k-1:k,2));
-% %                             v = sqrt(vx.^2 + vy.^2);
-%                         end 
-                        
-                        % check if cursor is in BOX and velocity is below
-                        %  threshold
-                        if current_pos(1) > leftX1 && current_pos(1) < leftX2 && current_pos(2) > leftY1 && current_pos(2) < leftY2
-                                % here we want to set a threshold value of 30 mm/s over x (= 25) number of
-                                % consecutive samples (see Tseng et al. 2007)
-                                if all(cursor_v(k-25:k)<30)
-                                    enterResp = true;
-                                    resp = leftResp; 
-                                end
-                        elseif current_pos(1) > rightX1 && current_pos(1) < rightX2 && current_pos(2) > rightY1 && current_pos(2) < rightY2
-                                if all(cursor_v(k-25:k)<30)
-                                    enterResp = true;
-                                    resp = rightResp; 
-                                end
-                        else enterResp=false;
-                        end
-                                                                       
-                        % SAMPLING RATE     
+                        % SAMPLING RATE
                         t(k) = GetSecs - begintime;
                         
                         sampletime(k) = GetSecs;
@@ -599,12 +567,12 @@ KeyBoardNum = GetKeyboardIndices;
             Screen('Flip', win);
             WaitSecs(probeDelay); 
             
-                % determine whether L or R response is the correct response
-                if CurrentSampleIndex == 1
-                    correctProbeResp = leftProbeResp; 
-                elseif CurrentSampleIndex == 2
-                    correctProbeResp = rightProbeResp;  
-                end
+            % determine whether L or R response is the correct response
+            if CurrentSampleIndex == 1
+                correctProbeResp = leftProbeResp; 
+            elseif CurrentSampleIndex == 2
+                correctProbeResp = rightProbeResp;  
+            end
                 
             
             %[minSmoothPointSize, maxSmoothPointSize, minAliasedPointSize, maxAliasedPointSize] = Screen('DrawDots', win, xy, 15, [0 0 0], center, 1);
@@ -631,7 +599,6 @@ KeyBoardNum = GetKeyboardIndices;
 
                     trial_path = [];
                     cursor_dist = [];
-                    cursor_v = [];
                     cursor_moved = false; 
                     cursor_in_box = false; 
                     
@@ -641,7 +608,7 @@ KeyBoardNum = GetKeyboardIndices;
                     begintime = GetSecs;
                     nextsampletime = begintime;
                     k = 0;
-                    %desiredSampleRate = 500; 
+                    %desiredSampleRate = 60; 
                     
                     
                     % LOOP FOR COLLECTING MOUSE RESPONSE DATA FOR MOTOR
@@ -650,27 +617,41 @@ KeyBoardNum = GetKeyboardIndices;
                     %  associated with the color cue
                     while enterResp==false                        
                         
-                        k = k+1;
-                 
+                        k = k+1; 
+                        
+                        % CLICK SECTION 
+                        %[~, responseX, responseY, buttons] = GetClicks(win, 0);%gives coords of each click                         
+                        [responseX, responseY, mouseClick] = GetMouse;
+                        
+                        %if any(buttons)                        
+                        if mouseClick(1) == 1
+                        
+                            % if a click falls within the response box range, response is entered 
+                            if responseX > leftX1 && responseX < leftX2 && responseY > leftY1 && responseY < leftY2
+                                enterResp = true;
+                                probeResp = leftResp;                                   
+                                
+                            elseif responseX > rightX1 && responseX < rightX2 && responseY > rightY1 && responseY < rightY2
+                                enterResp = true;
+                                probeResp = rightResp;
+                                
+                            %elseif responseX > topX1 && responseX < topX2 && responseY > topY1 && responseY < topY2
+                             %   enterResp = true;
+                              %  resp = upResp;              
+                                
+                            % if a click surrounds the response box, but doesn't fall inside it, do nothing     
+                            else enterResp=false;   
+                            end                                                 
+                        end
+                        
                         % MOUSE POSITION SECTION 
                         % recording the coordinates of the cursor until the loop is broken with click inside a box 
                         [x,y,buttons] = GetMouse(win);
                         current_pos = [x, y, buttons];
-                        trial_path = [trial_path; current_pos];                      
+                        trial_path = [trial_path; current_pos];
                         
                         % calculating distance cursor has moved 
                         cursor_dist(k) = sqrt((x-Xcenter)^2 + (y-Ycenter)^2);
-                        if k >=6
-                            % v is calculated by looking at distance traveled over 5 samples
-                            %  (which should equal 10 ms if sampling at 500 Hz); 
-                            %  (given USB sampling rate limit of 125 Hz, this
-                            %   must be greater than 8 ms); 
-                            % converting into mm/sec requires dividing by .01 (10 ms in s) 
-                            %  and multiplying by (mm/pixel) conversion factor
-                            cursor_v(k) = (((cursor_dist(k)-cursor_dist(k-5))/(.01))*mm_per_pixel);
-                        else
-                            cursor_v(k) = nan;
-                        end          
 
                         % RECORDING INITIAL MOVEMENT TIME 
                         % if cursor moves farther away than the bounding distance
@@ -681,16 +662,16 @@ KeyBoardNum = GetKeyboardIndices;
                         elseif cursor_moved == true
                         else move_init = 0;
                         end 
-                        
+                                               
                         % RECORDING TIME ENTERING THE BOX 
                         %if cursor moves into correct box for the FIRST time
                         % center position, get the time of that movement 
                         %enter_box = 0;
                         if cursor_in_box == false                          
-                            if correctResp == leftResp && current_pos(1) > leftX1 && current_pos(1) < leftX2 && current_pos(2) > leftY1 && current_pos(2) < leftY2
+                            if correctProbeResp == leftResp && current_pos(1) > leftX1 && current_pos(1) < leftX2 && current_pos(2) > leftY1 && current_pos(2) < leftY2
                                 enter_box = GetSecs; 
                                 cursor_in_box = true; 
-                            elseif correctResp == rightResp && current_pos(1) > rightX1 && current_pos(1) < rightX2 && current_pos(2) > rightY1 && current_pos(2) < rightY2
+                            elseif correctProbeResp == rightResp && current_pos(1) > rightX1 && current_pos(1) < rightX2 && current_pos(2) > rightY1 && current_pos(2) < rightY2
                                 enter_box = GetSecs; 
                                 cursor_in_box = true;  
                             else enter_box = 0; 
@@ -699,35 +680,7 @@ KeyBoardNum = GetKeyboardIndices;
                         %else enter_box = 0; 
                         end
                         
-%                         % CALCULATING VELOCITY                                       
-%                         if k > 6
-% %                             vx = diff(trial_path(k-1:k,1));
-% %                             vy = diff(trial_path(k-1:k,1));
-% %                             v = sqrt(vx.^2 + vy.^2);
-%                             
-%                             mx = diff(trial_path(k-5:k,1)); % motion in x direction 
-%                             my = diff(trial_path(k-5:k,2)); % motion in y direction 
-%                             m = sqrt(mx.^2 + my.^2); % displacement vector length 
-%                             v = mean(abs(diff(m))); % mean of the absolute value of velocity (speed) for last 5 data points sampled 
-%                             
-%                         end 
-                        
-                        % check if cursor is in BOX and velocity is below
-                        % threshold of 10 
-                        if current_pos(1) > leftX1 && current_pos(1) < leftX2 && current_pos(2) > leftY1 && current_pos(2) < leftY2
-                                if all(cursor_v(k-25:k)<30)
-                                    enterResp = true;
-                                    probeResp = leftResp; 
-                                end
-                        elseif current_pos(1) > rightX1 && current_pos(1) < rightX2 && current_pos(2) > rightY1 && current_pos(2) < rightY2
-                                if all(cursor_v(k-25:k)<30)
-                                    enterResp = true;
-                                    probeResp = rightResp; 
-                                end
-                        else enterResp=false;
-                        end
-                        
-                        % SAMPLING RATE  
+                        % SAMPLING RATE                           
                         t(k) = GetSecs - begintime;
                         
                         sampletime(k) = GetSecs;
@@ -779,7 +732,8 @@ KeyBoardNum = GetKeyboardIndices;
                     box_rt = enter_box - probeTime; 
                     if enter_box == 0
                         box_rt = 0;
-                    end                 
+                    end       
+                    
                     probe_enter_box_msecRT = round(1000*box_rt); 
                     if probe_enter_box_msecRT == 0
                         probe_enter_box_msecRT = 'No-move';
@@ -914,10 +868,10 @@ KeyBoardNum = GetKeyboardIndices;
 
 
 %name of data output file 
-cursor_data_filename = strcat('MotorData/WM_Simon_arrow_mouse_recall_veloc_', subject, '_cursor_data.mat'); 
+cursor_data_filename = strcat('MotorData/WM_Simon_arrow_mouse_recall_v2_', subject, '_cursor_data.mat'); 
 save(cursor_data_filename, 'cursor_path'); 
 
-cursor_data_filename_probe = strcat('MotorData/WM_Simon_arrow_mouse_recall_veloc_', subject, '_cursor_probe_data.mat'); 
+cursor_data_filename_probe = strcat('MotorData/WM_Simon_arrow_mouse_recall_v2_', subject, '_cursor_probe_data.mat'); 
 save(cursor_data_filename_probe, 'cursor_path_probe'); 
 
 
