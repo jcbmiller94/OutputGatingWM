@@ -15,6 +15,7 @@ rng('default'); %sometimes, if you've recently initiated the legacy random numbe
 rng('shuffle');
 
 KbName('UnifyKeyNames'); 
+esc = KbName('ESCAPE');
     
 %message pops up in the command window to ask for subject number   
 subject = input('Enter SUBJECT number ', 's');
@@ -428,6 +429,15 @@ KeyBoardNum = GetKeyboardIndices;
                     %  associated with the color cue
                     while enterResp==false                        
                         
+                        % Exits experiment when ESC key is pressed. 
+                        [keyIsDown, secs, keyCode] = KbCheck;
+                        if keyIsDown
+                            if keyCode(esc)
+                    %             Screen('CloseAll')
+                                break
+                            end
+                        end
+                        
                         k = k+1;
                         
                         % MOUSE POSITION SECTION 
@@ -447,7 +457,7 @@ KeyBoardNum = GetKeyboardIndices;
                             %  and multiplying by (mm/pixel) conversion factor
                             cursor_v(k) = (((cursor_dist(k)-cursor_dist(k-5))/(.01))*mm_per_pixel);
                         else
-                            cursor_v(k) = nan;
+                            cursor_v(k) = 0;
                         end          
 
                         % RECORDING INITIAL MOVEMENT TIME 
@@ -508,12 +518,12 @@ KeyBoardNum = GetKeyboardIndices;
                         if current_pos(1) > leftX1 && current_pos(1) < leftX2 && current_pos(2) > leftY1 && current_pos(2) < leftY2
                                 % here we want to set a threshold value of 30 mm/s over x (= 25) number of
                                 % consecutive samples (see Tseng et al. 2007)
-                                if all(cursor_v(k-25:k)<30)
+                                if all(cursor_v(k-10:k)<30)
                                     enterResp = true;
                                     resp = leftResp; 
                                 end
                         elseif current_pos(1) > rightX1 && current_pos(1) < rightX2 && current_pos(2) > rightY1 && current_pos(2) < rightY2
-                                if all(cursor_v(k-25:k)<30)
+                                if all(cursor_v(k-10:k)<30) %15 samples = 30ms
                                     enterResp = true;
                                     resp = rightResp; 
                                 end
@@ -651,7 +661,16 @@ KeyBoardNum = GetKeyboardIndices;
                     % TASK 
                     % this loop will listen for clicks inside the boxes
                     %  associated with the color cue
-                    while enterResp==false                        
+                    while enterResp==false                           
+                        
+                        % Exits experiment when ESC key is pressed. 
+                        [keyIsDown, secs, keyCode] = KbCheck;
+                        if keyIsDown
+                            if keyCode(esc)
+                    %             Screen('CloseAll')
+                                break
+                            end
+                        end
                         
                         k = k+1;
                  
@@ -672,7 +691,7 @@ KeyBoardNum = GetKeyboardIndices;
                             %  and multiplying by (mm/pixel) conversion factor
                             cursor_v(k) = (((cursor_dist(k)-cursor_dist(k-5))/(.01))*mm_per_pixel);
                         else
-                            cursor_v(k) = nan;
+                            cursor_v(k) = 0;
                         end          
 
                         % RECORDING INITIAL MOVEMENT TIME 
@@ -718,12 +737,12 @@ KeyBoardNum = GetKeyboardIndices;
                         % check if cursor is in BOX and velocity is below
                         % threshold of 10 
                         if current_pos(1) > leftX1 && current_pos(1) < leftX2 && current_pos(2) > leftY1 && current_pos(2) < leftY2
-                                if all(cursor_v(k-25:k)<30)
+                                if all(cursor_v(k-10:k)<30)
                                     enterResp = true;
                                     probeResp = leftResp; 
                                 end
                         elseif current_pos(1) > rightX1 && current_pos(1) < rightX2 && current_pos(2) > rightY1 && current_pos(2) < rightY2
-                                if all(cursor_v(k-25:k)<30)
+                                if all(cursor_v(k-10:k)<30)
                                     enterResp = true;
                                     probeResp = rightResp; 
                                 end
