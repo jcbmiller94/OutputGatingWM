@@ -562,22 +562,22 @@ KeyBoardNum = GetKeyboardIndices;
                         if current_pos(1) > leftX1 && current_pos(1) < leftX2 && current_pos(2) > leftY1 && current_pos(2) < leftY2
                                 % here we want to set a threshold value of 30 mm/s over x (= 25) number of
                                 % consecutive samples (see Tseng et al. 2007)
-                                if all(cursor_v(k-10:k)<30)
+                                if k > 10 && all(cursor_v(k-10:k)<30)
                                     enterResp = true;
                                     resp = leftResp; 
                                 end
                         elseif current_pos(1) > rightX1 && current_pos(1) < rightX2 && current_pos(2) > rightY1 && current_pos(2) < rightY2
-                                if all(cursor_v(k-10:k)<30) %15 samples = 30ms
+                                if k > 10 && all(cursor_v(k-10:k)<30) %15 samples = 30ms
                                     enterResp = true;
                                     resp = rightResp; 
                                 end
                         elseif current_pos(1) > upX1 && current_pos(1) < upX2 && current_pos(2) > upY1 && current_pos(2) < upY2    
-                                if all(cursor_v(k-10:k)<30)
+                                if k > 10 && all(cursor_v(k-10:k)<30)
                                     enterResp = true;
                                     resp = upResp; 
                                 end
                         elseif current_pos(1) > downX1 && current_pos(1) < downX2 && current_pos(2) > downY1 && current_pos(2) < downY2
-                                if all(cursor_v(k-10:k)<30)
+                                if k > 10 && all(cursor_v(k-10:k)<30)
                                     enterResp = true;
                                     resp = downResp; 
                                 end
@@ -799,22 +799,22 @@ KeyBoardNum = GetKeyboardIndices;
                         % check if cursor is in BOX and velocity is below
                         % threshold of 10 
                         if current_pos(1) > leftX1 && current_pos(1) < leftX2 && current_pos(2) > leftY1 && current_pos(2) < leftY2
-                                if all(cursor_v(k-10:k)<30)
+                                if k > 10 && all(cursor_v(k-10:k)<30)
                                     enterResp = true;
                                     probeResp = leftResp; 
                                 end
                         elseif current_pos(1) > rightX1 && current_pos(1) < rightX2 && current_pos(2) > rightY1 && current_pos(2) < rightY2
-                                if all(cursor_v(k-10:k)<30)
+                                if k > 10 && all(cursor_v(k-10:k)<30)
                                     enterResp = true;
                                     probeResp = rightResp; 
                                 end
                         elseif current_pos(1) > upX1 && current_pos(1) < upX2 && current_pos(2) > upY1 && current_pos(2) < upY2    
-                                if all(cursor_v(k-10:k)<30)
+                                if k > 10 && all(cursor_v(k-10:k)<30)
                                     enterResp = true;
                                     probeResp = upResp; 
                                 end
                         elseif current_pos(1) > downX1 && current_pos(1) < downX2 && current_pos(2) > downY1 && current_pos(2) < downY2
-                                if all(cursor_v(k-10:k)<30)
+                                if k > 10 && all(cursor_v(k-10:k)<30)
                                     enterResp = true;
                                     probeResp = downResp; 
                                 end
