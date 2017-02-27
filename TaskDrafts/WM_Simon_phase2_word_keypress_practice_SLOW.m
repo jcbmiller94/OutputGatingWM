@@ -3,7 +3,7 @@
 %   movement metric: velocity-based (20 ms averaging) 
 %   probe: recall
 
-function WM_Simon_phase2_word_keypress
+function WM_Simon_phase2_word_keypress_practice_SLOW
 
 %%% timestamp movement onset and add to results printout 
 
@@ -14,31 +14,31 @@ rng('shuffle');
 KbName('UnifyKeyNames'); 
 esc = KbName('ESCAPE');
     
-% message pops up in the command window to ask for subject number   
-subject = input('Enter SUBJECT number ', 's');
-
-% name of data output file 
-datafilename = strcat('MotorData/WM_Simon_phase2_word_keypress_', subject, '.txt'); 
-
-% if a file with that same info already exists in the data folder, give a
-%  new subject #, or overwrite the existing file
-if exist(datafilename)==2
-    disp ('A file with this name already exists')
-    overwrite = input('overwrite?, y/n \n', 's');
-    if strcmpi(overwrite, 'n')
-        %disp('enter new subject number');
-        newsub = input('New SUBJECT number? ', 's');
-        datafilename = strcat('MotorData/WM_Simon_phase2_word_keypress_', newsub, '.txt');
-    end
-end
-
-% make a space-delimited text output file where each trial is a row
-fid = fopen(datafilename, 'w');
-fprintf(fid, 'subject block trial CurrentCondition TrialType CurrentSampleIndex CurrentSample cueColor correctResp Resp ACC msecRT move_init_msecRT move_init_bound_msecRT enter_box_msecRT velocity_drop_msecRT correctProbeResp probeResp probeACC probemsecRT probe_move_init_msecRT probe_move_init_bound_msecRT probe_enter_box_msecRT probe_velocity_drop_msecRT\n');
-
-% make a cell array to hold data for tracking the cursor path 
-%  in this cell array, each row is a block and each column is a trial
-%  (each element being the path for that trial in that block)
+% % message pops up in the command window to ask for subject number   
+% subject = input('Enter SUBJECT number ', 's');
+% 
+% % name of data output file 
+% datafilename = strcat('MotorData/WM_Simon_phase2_word_keypress_', subject, '.txt'); 
+% 
+% % if a file with that same info already exists in the data folder, give a
+% %  new subject #, or overwrite the existing file
+% if exist(datafilename)==2
+%     disp ('A file with this name already exists')
+%     overwrite = input('overwrite?, y/n \n', 's');
+%     if strcmpi(overwrite, 'n')
+%         %disp('enter new subject number');
+%         newsub = input('New SUBJECT number? ', 's');
+%         datafilename = strcat('MotorData/WM_Simon_phase2_word_keypress_', newsub, '.txt');
+%     end
+% end
+% 
+% % make a space-delimited text output file where each trial is a row
+% fid = fopen(datafilename, 'w');
+% fprintf(fid, 'subject block trial CurrentCondition TrialType CurrentSampleIndex CurrentSample cueColor correctResp Resp ACC msecRT move_init_msecRT move_init_bound_msecRT enter_box_msecRT velocity_drop_msecRT correctProbeResp probeResp probeACC probemsecRT probe_move_init_msecRT probe_move_init_bound_msecRT probe_enter_box_msecRT probe_velocity_drop_msecRT\n');
+% 
+% % make a cell array to hold data for tracking the cursor path 
+% %  in this cell array, each row is a block and each column is a trial
+% %  (each element being the path for that trial in that block)
 
 cursor_path = {};
 cursor_path_probe = {};
@@ -93,14 +93,17 @@ KeyBoardNum = GetKeyboardIndices;
 %% Specify timing and condition values
 
     ITI = 1; % orig = 1
-    SampleShow = 1;
+    SampleShow = 2;
     WMDelay = 2; %orig = 1.5
-    responseDeadline = 2; %orig = 4
-    probeDelay = 1;
+    responseDeadline = 3; %orig = 4
+    probeDelay = 2;
     WMProbe = 2; %orig = 2
     
-    BlockNum = 10; %10
-    TrialNum = 30; %30
+    feedback = 1;
+
+    
+    BlockNum = 1; %10
+    TrialNum = 6; %30
     
     % change detection response keys
     leftProbeResp = 'L';
@@ -265,10 +268,41 @@ KeyBoardNum = GetKeyboardIndices;
 %% Start task block loop
         
     %show instruction screen
-    welcome=sprintf('Clink in box indicated by color \n green: left \n pink: right \n orange: up \n blue: down \n\nThen, click arrow key that word indicated \n\n\nPress space to begin the experiment \n \n \n');
+    
+    instructions=sprintf(['This is a practice of the experiment you will be doing\n\n\nThe word up, down, left, or right will appear\n\n\n' ... 
+        'Remember the word/direction....\n\n\n(Press space to continue)']); 
+    DrawFormattedText(win, instructions, 'center', 'center', 0);
+    Screen('Flip', win);    
+    if IsOSX
+        getKey('space', KeyBoardNum); %OSX requires a device number whereas windows requires none
+    else
+        getKey('space');
+    end
+    
+    instructions=sprintf(['Four boxes will then appear, with your cursor on the middle of the screen\n\n\n Based on the color of the middle box, click in one of the other boxes\n\n' ... 
+    'green: left \n pink: right \n orange: up \n blue: down\n\n\n(Press space to continue)']); 
+    DrawFormattedText(win, instructions, 'center', 'center', 0);
+    Screen('Flip', win);    
+    if IsOSX
+        getKey('space', KeyBoardNum); %OSX requires a device number whereas windows requires none
+    else
+        getKey('space');
+    end  
+    
+
+    instructions=sprintf(['On the next screen, you will be asked to indicate the word/direction \n\n\n Press the arrow key on the keyboard to indicate the word/direction\n\n\n(Press space to continue)']);
+    DrawFormattedText(win, instructions, 'center', 'center', 0);
+    Screen('Flip', win);    
+    if IsOSX
+        getKey('space', KeyBoardNum); %OSX requires a device number whereas windows requires none
+    else
+        getKey('space');
+    end  
+    
+    
+    welcome=sprintf('Clink in box indicated by color \n green: left \n pink: right \n orange: up \n blue: down \n\nThen, press arrowkey indicated by remembered word \n\n\nPress space to begin the experiment \n \n \n');
     DrawFormattedText(win, welcome, 'center', 'center', 0);
     Screen('Flip', win);
-    %'Flip' called to put stimuli onto screen 
     
     % Wait for a key press using the custom getkey function (appended to
     % end of script)
@@ -724,10 +758,21 @@ KeyBoardNum = GetKeyboardIndices;
                 %calculate accuracy
                 Accuracy = strcmp(resp,correctResp); 
 
-                if Accuracy == 1 
+%                 if Accuracy == 1 
+%                     ACC = 1;
+%                 else ACC = 0;
+%                 end  
+                
+                 if Accuracy == 1 
                     ACC = 1;
+                    DrawFormattedText(win, 'Correct!', 'center', 'center', 0);
+                    Screen('Flip', win); 
+                    WaitSecs(feedback);
                 else ACC = 0;
-                end            
+                    DrawFormattedText(win, 'Incorrect', 'center', 'center', 0);
+                    Screen('Flip', win); 
+                    WaitSecs(feedback);
+                end   
                        
             
             HideCursor;
@@ -1077,45 +1122,64 @@ KeyBoardNum = GetKeyboardIndices;
 
                 probeAccuracy = strcmp(probeResp,correctProbeResp); 
 
+%                 if probeAccuracy == 1 
+%                     probeACC = 1;
+%                 else probeACC = 0;
+%                 end    
+%                 
                 if probeAccuracy == 1 
                     probeACC = 1;
+                    DrawFormattedText(win, 'Correct!', 'center', 'center', 0);
+                    Screen('Flip', win); 
+                    WaitSecs(feedback);
                 else probeACC = 0;
-                end            
+                    DrawFormattedText(win, 'Incorrect', 'center', 'center', 0);
+                    Screen('Flip', win); 
+                    WaitSecs(feedback);
+                end   
                 
-                % Fill sections for mose click version as 'NA' 
-                probe_move_init_msecRT = 'NA'; 
-                probe_move_init_bound_msecRT = 'NA'; 
-                probe_enter_box_msecRT = 'NA'; 
-                probe_velocity_drop_msecRT = 'NA'; 
-                            
+                
+                % Fill sections from mouse click version as 'NA' 
+%                 probe_move_init_msecRT = 'NA'; 
+%                 probe_move_init_bound_msecRT = 'NA'; 
+%                 probe_enter_box_msecRT = 'NA'; 
+%                 probe_velocity_drop_msecRT = 'NA'; 
+                 
+
+                %let them know that they have completed one trial
+                if trial == 1
+                    DrawFormattedText(win, 'You completed one practice trial!\n\n\nNow, you will complete several trials in a row', 'center', 'center', 0);
+                    Screen('Flip', win); 
+                    WaitSecs(2);
+                end             
                 
         %add movement initiation time and data type
         %print trial info to data file
-            fprintf(fid,'%s %i %i %i %s %d %s %s %s %s %d %s %s %s %s %s %s %s %d %s %s %s %s %s\n',...
-            subject,...
-            block,...
-            trial,... 
-            CurrentCondition,...
-            TrialType,...
-            CurrentSampleIndex,...
-            CurrentSample,...
-            cueColor,...
-            correctResp,...
-            resp,...
-            ACC,...
-            msecRT,...
-            move_init_msecRT,...
-            move_init_bound_msecRT,...
-            enter_box_msecRT,...
-            velocity_drop_msecRT,...
-            correctProbeResp,...
-            probeResp,...
-            probeACC,...
-            probemsecRT,...
-            probe_move_init_msecRT,...
-            probe_move_init_bound_msecRT,...
-            probe_enter_box_msecRT,...
-            probe_velocity_drop_msecRT);
+%             fprintf(fid,'%s %i %i %i %s %d %s %s %s %s %d %s %s %s %s %s %s %s %d %s %s %s %s %s\n',...
+%             subject,...
+%             block,...
+%             trial,... 
+%             CurrentCondition,...
+%             TrialType,...
+%             CurrentSampleIndex,...
+%             CurrentSample,...
+%             cueColor,...
+%             correctResp,...
+%             resp,...
+%             ACC,...
+%             msecRT,...
+%             move_init_msecRT,...
+%             move_init_bound_msecRT,...
+%             enter_box_msecRT,...
+%             velocity_drop_msecRT,...
+%             correctProbeResp,...
+%             probeResp,...
+%             probeACC,...
+%             probemsecRT,...
+%             probe_move_init_msecRT,...
+%             probe_move_init_bound_msecRT,...
+%             probe_enter_box_msecRT,...
+%             probe_velocity_drop_msecRT);
     
         end
     
@@ -1149,11 +1213,11 @@ KeyBoardNum = GetKeyboardIndices;
 
 
 % name of data output file 
-cursor_data_filename = strcat('MotorData/WM_Simon_phase2_word_keypress_', subject, '_cursor_data.mat'); 
-save(cursor_data_filename, 'cursor_path'); 
-
-velocity_data_filename = strcat('MotorData/WM_Simon_phase2_word_keypress_', subject, '_velocity_data.mat'); 
-save(velocity_data_filename, 'cursor_velocity'); 
+% cursor_data_filename = strcat('MotorData/WM_Simon_phase2_word_keypress_', subject, '_cursor_data.mat'); 
+% save(cursor_data_filename, 'cursor_path'); 
+% 
+% velocity_data_filename = strcat('MotorData/WM_Simon_phase2_word_keypress_', subject, '_velocity_data.mat'); 
+% save(velocity_data_filename, 'cursor_velocity'); 
 
 % cursor_data_filename_probe = strcat('MotorData/WM_Simon_phase2_word_keypress_', subject, '_cursor_probe_data.mat'); 
 % save(cursor_data_filename_probe, 'cursor_path_probe'); 
